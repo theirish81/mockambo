@@ -39,5 +39,46 @@ func TestGenerateString(t *testing.T) {
 	}, extension.Mext{})
 	_, err := time.Parse(RFC3339local, res)
 	assert.Nil(t, err)
+}
 
+func TestGenerateFloat(t *testing.T) {
+	res := generateFloat(&openapi3.Schema{
+		Type:   &openapi3.Types{"number"},
+		Format: "float",
+	}, extension.Mext{})
+	assert.IsType(t, 1.5, res)
+
+	mn := 0.5
+	mx := 1.2
+	res = generateFloat(&openapi3.Schema{
+		Type:   &openapi3.Types{"number"},
+		Format: "float",
+		Min:    &mn,
+		Max:    &mx,
+	}, extension.Mext{})
+	assert.GreaterOrEqual(t, res, 0.5)
+	assert.LessOrEqual(t, res, 1.2)
+
+	res = generateFloat(&openapi3.Schema{
+		Type:   &openapi3.Types{"number"},
+		Format: "foo",
+	}, extension.Mext{})
+	assert.IsType(t, 1.2, res)
+}
+
+func TestGenerateInt(t *testing.T) {
+	res := generateInt(&openapi3.Schema{
+		Type: &openapi3.Types{"integer"},
+	}, extension.Mext{})
+	assert.IsType(t, 1, res)
+
+	var mn float64 = 1
+	var mx float64 = 5
+	res = generateInt(&openapi3.Schema{
+		Type: &openapi3.Types{"integer"},
+		Min:  &mn,
+		Max:  &mx,
+	}, extension.Mext{})
+	assert.GreaterOrEqual(t, res, 1)
+	assert.LessOrEqual(t, res, 5)
 }

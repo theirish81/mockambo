@@ -26,7 +26,7 @@ func NewResponseDef(r *openapi3.Response, status int, mext extension.Mext, vm *g
 }
 
 func (r ResponseDef) determineMediaType() string {
-	for k, _ := range r.r.Content {
+	for k := range r.r.Content {
 		if strings.Contains(k, "json") {
 			return k
 		}
@@ -56,16 +56,16 @@ func (r ResponseDef) generateHeaders(mext extension.Mext) (http.Header, error) {
 }
 
 func (r ResponseDef) GenerateResponseBundle(mext extension.Mext) (*util.Response, error) {
-	res := util.Response{}
+	res := util.NewResponse()
 	var err error
 	if res.Headers, err = r.generateHeaders(mext); err != nil {
-		return &res, err
+		return res, err
 	}
 	res.ContentType = r.determineMediaType()
 	res.Headers.Set(util.HeaderContentType, res.ContentType)
 	res.Status = r.status
 	if res.Payload, err = r.generateResponsePayload(mext); err != nil {
-		return &res, err
+		return res, err
 	}
-	return &res, nil
+	return res, nil
 }

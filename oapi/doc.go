@@ -33,7 +33,7 @@ func (d Doc) FindRoute(request *util.Request) (RouteDef, error) {
 	if err != nil {
 		return RouteDef{}, err
 	}
-	return NewRoute(d, r, p)
+	return NewRouteDef(d, r, p)
 }
 
 func (d Doc) Servers() []string {
