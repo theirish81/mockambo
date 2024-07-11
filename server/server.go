@@ -22,6 +22,7 @@ func NewServer(port int, doc oapi.Doc) Server {
 	server.e.HidePort = true
 	server.e.Any("/**", server.handler)
 	server.e.HTTPErrorHandler = func(err error, c echo.Context) {
+		c.Response().Header().Set("X-Mockambo", "true")
 		_ = c.JSON(http.StatusInternalServerError, map[string]any{"message": err.Error()})
 	}
 	return server
