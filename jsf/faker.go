@@ -7,11 +7,10 @@ import (
 )
 
 func InstrumentVM(vm *goja.Runtime) {
-	_ = vm.Set("fakeString", FakeString)
-	_ = vm.Set("fakeInt", gofakeit.Uint32)
+	_ = vm.Set("fake", Fake)
 }
 
-func FakeString(t string) string {
+func Fake(t string) any {
 	switch t {
 	case "address":
 		return gofakeit.Address().Address
@@ -35,6 +34,8 @@ func FakeString(t string) string {
 		return gofakeit.Email()
 	case "creditCard":
 		return fmt.Sprintf("%d", gofakeit.CreditCardNumber())
+	case "int":
+		return gofakeit.Int32()
 	default:
 		return gofakeit.Word()
 	}

@@ -24,7 +24,7 @@ type Mext struct {
 
 func NewDefaultMextFromExtensions(extensions map[string]any) (Mext, error) {
 	mext := Mext{
-		PayloadGenerationModes: []string{"script", "default", "example", "schema"},
+		PayloadGenerationModes: []string{"script", "faker", "default", "example", "schema"},
 		ValidateRequest:        true,
 		ValidateResponse:       true,
 		Display:                false,

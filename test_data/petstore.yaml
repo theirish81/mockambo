@@ -649,15 +649,11 @@ components:
           type: string
           example: John
           x-mockambo:
-            payloadGenerationModes:
-              - schema
             faker: firstName
         lastName:
           type: string
           example: James
           x-mockambo:
-            payloadGenerationModes:
-              - schema
             faker: lastName
         email:
           type: string
@@ -698,8 +694,6 @@ components:
           type: string
           example: doggie
           x-mockambo:
-            payloadGenerationModes:
-              - schema
             faker: firstName
         category:
           $ref: '#/components/schemas/Category'
@@ -710,7 +704,7 @@ components:
           items:
             type: string
             x-mockambo:
-              script: "'http://example.com/'+pathItems.petId+'/'+fakeInt()"
+              script: "'http://example.com/'+pathItems.petId+'/'+fake('int')"
         tags:
           type: array
           items:
