@@ -36,6 +36,14 @@ func Fake(t string) any {
 		return fmt.Sprintf("%d", gofakeit.CreditCardNumber())
 	case "int":
 		return gofakeit.Int32()
+	case "float":
+		return gofakeit.Float32()
+	case "boolean":
+		return gofakeit.Bool()
+	case "currency":
+		return gofakeit.CurrencyLong()
+	case "currencyCode":
+		return gofakeit.CurrencyShort()
 	default:
 		return gofakeit.Word()
 	}
