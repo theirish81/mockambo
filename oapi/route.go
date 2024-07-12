@@ -11,6 +11,7 @@ import (
 	"log"
 	"mockambo/db"
 	"mockambo/extension"
+	"mockambo/jsf"
 	"mockambo/proxy"
 	"mockambo/util"
 	"time"
@@ -29,6 +30,7 @@ type RouteDef struct {
 func NewRouteDef(doc Doc, route *routers.Route, pathItems map[string]string) (RouteDef, error) {
 	mext, err := extension.MergeDefaultMextWithExtensions(doc.defaultMext, route.Operation.Extensions)
 	vm := goja.New()
+	jsf.InstrumentVM(vm)
 	_ = vm.Set("pathItems", pathItems)
 	_ = vm.Set("error", "")
 	return RouteDef{doc: doc, route: route, pathItems: pathItems, mext: mext, vm: vm}, err

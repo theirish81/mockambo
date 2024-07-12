@@ -22,11 +22,6 @@ externalDocs:
   url: http://swagger.io
 servers:
   - url: /api/v3
-x-mockambo:
-  payloadGenerationModes:
-    - default
-    - example
-    - schema
 tags:
   - name: pet
     description: Everything about your Pets
@@ -653,9 +648,17 @@ components:
         firstName:
           type: string
           example: John
+          x-mockambo:
+            payloadGenerationModes:
+              - schema
+            faker: firstName
         lastName:
           type: string
           example: James
+          x-mockambo:
+            payloadGenerationModes:
+              - schema
+            faker: lastName
         email:
           type: string
           example: john@email.com
@@ -687,8 +690,6 @@ components:
         id:
           type: integer
           x-mockambo:
-            payloadGenerationModes:
-              - script
             script: "parseInt(pathItems.petId)"
             display: true
           format: int64
@@ -696,16 +697,20 @@ components:
         name:
           type: string
           example: doggie
+          x-mockambo:
+            payloadGenerationModes:
+              - schema
+            faker: firstName
         category:
           $ref: '#/components/schemas/Category'
         photoUrls:
           type: array
+          minItems: 2
+          maxItems: 5
           items:
             type: string
             x-mockambo:
-              payloadGenerationModes:
-                - script
-              script: "'http://example.com/'+pathItems.petId+'/'+new Date().getMilliseconds()"
+              script: "'http://example.com/'+pathItems.petId+'/'+fakeInt()"
         tags:
           type: array
           items:

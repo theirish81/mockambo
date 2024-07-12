@@ -33,7 +33,9 @@ func generateString(s *openapi3.Schema, mext extension.Mext) (string, error) {
 		mx = int(*s.MaxLength)
 	}
 	ln = mx
-	if len(s.Pattern) > 0 {
+	if mext.Faker != nil {
+		res = FakeString(*mext.Faker)
+	} else if len(s.Pattern) > 0 {
 		if res, err = regen.Generate(s.Pattern); err != nil {
 			return res, err
 		}
@@ -137,9 +139,24 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, vm *goja.R
 			}
 			if schema.Type.Includes(openapi3.TypeArray) {
 				res := make([]any, 0)
-				item, err := GenerateDataFromSchema(schema.Items.Value, mext, vm)
-				res = append(res, item)
-				return res, err
+				mn := int(schema.MinItems)
+				mx := 1
+				if schema.MaxItems != nil {
+					mx = int(*schema.MaxItems)
+				}
+				count := mn
+				if mx > count {
+					count = rand.Intn(mx-mn) + mn
+				}
+				for range count {
+					item, err := GenerateDataFromSchema(schema.Items.Value, mext, vm)
+					res = append(res, item)
+					if err != nil {
+						return res, err
+					}
+				}
+
+				return res, nil
 			}
 		case "script":
 			if mext.Script != nil {
