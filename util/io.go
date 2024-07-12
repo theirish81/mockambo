@@ -41,6 +41,10 @@ func (r Request) Request() *http.Request {
 	return r.request
 }
 
+func NewResponse() *Response {
+	return &Response{}
+}
+
 func StatusCodeOrDefault(status string, def int) int {
 	if val, err := strconv.Atoi(status); err == nil {
 		return val
@@ -49,7 +53,7 @@ func StatusCodeOrDefault(status string, def int) int {
 }
 
 func WriteJSON(ctx echo.Context, res *Response) error {
-	for k, _ := range res.Headers {
+	for k := range res.Headers {
 		ctx.Response().Header().Set(k, res.Headers.Get(k))
 	}
 	if res.Payload != nil {

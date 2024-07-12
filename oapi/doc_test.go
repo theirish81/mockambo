@@ -16,3 +16,10 @@ func TestDoc_FindRoute(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "getPetById", route.OperationID())
 }
+
+func TestDoc_Servers(t *testing.T) {
+	data, _ := os.ReadFile("../test_data/petstore.yaml")
+	doc, _ := NewDoc(data)
+	servers := doc.Servers()
+	assert.Len(t, servers, 1)
+}

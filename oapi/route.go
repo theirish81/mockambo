@@ -26,7 +26,7 @@ type RouteDef struct {
 	vm                     *goja.Runtime
 }
 
-func NewRoute(doc Doc, route *routers.Route, pathItems map[string]string) (RouteDef, error) {
+func NewRouteDef(doc Doc, route *routers.Route, pathItems map[string]string) (RouteDef, error) {
 	mext, err := extension.MergeDefaultMextWithExtensions(doc.defaultMext, route.Operation.Extensions)
 	vm := goja.New()
 	_ = vm.Set("pathItems", pathItems)
@@ -44,7 +44,7 @@ func (r *RouteDef) Process(ctx context.Context, req *util.Request) (*util.Respon
 		r.setValidationError(r.validateRequest(ctx, req))
 
 	}
-	res := &util.Response{}
+	res := util.NewResponse()
 	var err error
 	if r.mext.Playback {
 		key, err := r.vm.RunString(r.mext.RecordingKey)
