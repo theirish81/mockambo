@@ -19,11 +19,12 @@ type Mext struct {
 	LatencyMin             string   `yaml:"latencyMin"`
 	LatencyMax             string   `yaml:"latencyMax"`
 	ResponseSelector       *string  `yaml:"responseSelector"`
+	Faker                  *string  `yaml:"faker"`
 }
 
 func NewDefaultMextFromExtensions(extensions map[string]any) (Mext, error) {
 	mext := Mext{
-		PayloadGenerationModes: []string{"default", "example", "schema", "script"},
+		PayloadGenerationModes: []string{"script", "faker", "default", "example", "schema"},
 		ValidateRequest:        true,
 		ValidateResponse:       true,
 		Display:                false,
@@ -48,6 +49,10 @@ func MergeDefaultMextWithExtensions(def Mext, extensions map[string]any) (Mext, 
 	def.Script = nil
 	def.Display = false
 	def.ResponseSelector = nil
+	def.Faker = nil
+	modes := def.PayloadGenerationModes
+	def.PayloadGenerationModes = make([]string, len(def.PayloadGenerationModes))
+	copy(def.PayloadGenerationModes, modes)
 	if ext, ok := extensions[MockamboExt]; ok {
 		if err := mapstructure.Decode(ext.(map[string]any), &def); err != nil {
 			return def, err

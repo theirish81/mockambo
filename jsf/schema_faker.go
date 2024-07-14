@@ -103,6 +103,10 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, vm *goja.R
 			if schema.Example != nil {
 				return schema.Example, nil
 			}
+		case "faker":
+			if mext.Faker != nil {
+				return Fake(*mext.Faker), nil
+			}
 		case "schema":
 			if schema.Type.Includes(openapi3.TypeString) {
 				return generateString(schema, mext)
@@ -137,9 +141,27 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, vm *goja.R
 			}
 			if schema.Type.Includes(openapi3.TypeArray) {
 				res := make([]any, 0)
-				item, err := GenerateDataFromSchema(schema.Items.Value, mext, vm)
-				res = append(res, item)
-				return res, err
+				mn := int(schema.MinItems)
+				mx := 1
+				if schema.MaxItems != nil {
+					mx = int(*schema.MaxItems)
+				}
+				count := mn
+				if mx > count {
+					count = rand.Intn(mx-mn) + mn
+				}
+				if count == 0 {
+					count = 1
+				}
+				for range count {
+					item, err := GenerateDataFromSchema(schema.Items.Value, mext, vm)
+					res = append(res, item)
+					if err != nil {
+						return res, err
+					}
+				}
+
+				return res, nil
 			}
 		case "script":
 			if mext.Script != nil {
