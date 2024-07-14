@@ -34,7 +34,7 @@ func Fake(t string) any {
 		return gofakeit.Email()
 	case "creditCard":
 		return fmt.Sprintf("%d", gofakeit.CreditCardNumber())
-	case "int":
+	case "integer":
 		return gofakeit.Int32()
 	case "float":
 		return gofakeit.Float32()
