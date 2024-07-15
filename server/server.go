@@ -12,10 +12,10 @@ import (
 type Server struct {
 	e    *echo.Echo
 	port int
-	doc  oapi.Doc
+	doc  *oapi.Doc
 }
 
-func NewServer(port int, doc oapi.Doc) Server {
+func NewServer(port int, doc *oapi.Doc) Server {
 	log.Println("initializing server on port:", port)
 	server := Server{e: echo.New(), port: port, doc: doc}
 	server.e.HideBanner = true

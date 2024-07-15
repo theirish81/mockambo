@@ -5,7 +5,6 @@ import (
 	"log"
 	"mockambo/oapi"
 	"mockambo/server"
-	"os"
 )
 
 var specFilePath string
@@ -23,13 +22,12 @@ var RunCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Runs the Mockambo server",
 	Run: func(cmd *cobra.Command, args []string) {
-		data, err := os.ReadFile(specFilePath)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		doc, err := oapi.NewDoc(data)
+		doc, err := oapi.NewDoc(specFilePath)
 		if err != nil {
 			log.Fatalln("The specified file `", specFilePath, "` is not a valid OpenAPI 3 specification")
+		}
+		if err := doc.Watch(); err != nil {
+			log.Fatalln(err)
 		}
 		sx := server.NewServer(port, doc)
 		if err := sx.Run(); err != nil {
