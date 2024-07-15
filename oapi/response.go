@@ -2,8 +2,8 @@ package oapi
 
 import (
 	"fmt"
-	"github.com/dop251/goja"
 	"github.com/getkin/kin-openapi/openapi3"
+	"mockambo/evaluator"
 	"mockambo/extension"
 	"mockambo/jsf"
 	"mockambo/util"
@@ -16,13 +16,13 @@ type ResponseDef struct {
 	r           *openapi3.Response
 	err         error
 	defaultMext extension.Mext
-	vm          *goja.Runtime
+	evaluator   evaluator.Evaluator
 }
 
-func NewResponseDef(r *openapi3.Response, status int, mext extension.Mext, vm *goja.Runtime) (ResponseDef, error) {
+func NewResponseDef(r *openapi3.Response, status int, mext extension.Mext, ev evaluator.Evaluator) (ResponseDef, error) {
 	defaultMext, err := extension.MergeDefaultMextWithExtensions(mext, r.Extensions)
-	_ = vm.Set("status", status)
-	return ResponseDef{r: r, status: status, defaultMext: defaultMext, vm: vm}, err
+	ev.Set("status", status)
+	return ResponseDef{r: r, status: status, defaultMext: defaultMext, evaluator: ev}, err
 }
 
 func (r ResponseDef) determineMediaType() string {
@@ -36,7 +36,7 @@ func (r ResponseDef) determineMediaType() string {
 
 func (r ResponseDef) generateResponsePayload(mext extension.Mext) (any, error) {
 	if mediaType := r.determineMediaType(); mediaType != "" {
-		return jsf.GenerateDataFromSchema(r.r.Content[mediaType].Schema.Value, mext, r.vm)
+		return jsf.GenerateDataFromSchema(r.r.Content[mediaType].Schema.Value, mext, r.evaluator)
 	}
 	return nil, nil
 }
@@ -45,7 +45,7 @@ func (r ResponseDef) generateHeaders(mext extension.Mext) (http.Header, error) {
 	headers := http.Header{}
 	for k, h := range r.r.Headers {
 		if util.RequiredOrRandom(h.Value.Required) {
-			val, err := jsf.GenerateDataFromSchema(h.Value.Schema.Value, mext, r.vm)
+			val, err := jsf.GenerateDataFromSchema(h.Value.Schema.Value, mext, r.evaluator)
 			if err != nil {
 				return headers, err
 			}

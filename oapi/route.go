@@ -5,11 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/dop251/goja"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/getkin/kin-openapi/routers"
 	"log"
 	"mockambo/db"
+	"mockambo/evaluator"
 	"mockambo/extension"
 	"mockambo/jsf"
 	"mockambo/proxy"
@@ -24,16 +24,15 @@ type RouteDef struct {
 	requestValidationInput *openapi3filter.RequestValidationInput
 	validationError        error
 	mext                   extension.Mext
-	vm                     *goja.Runtime
+	evaluator              evaluator.Evaluator
 }
 
 func NewRouteDef(doc *Doc, route *routers.Route, pathItems map[string]string) (RouteDef, error) {
 	mext, err := extension.MergeDefaultMextWithExtensions(doc.defaultMext, route.Operation.Extensions)
-	vm := goja.New()
-	jsf.InstrumentVM(vm)
-	_ = vm.Set("pathItems", pathItems)
-	_ = vm.Set("error", "")
-	return RouteDef{doc: doc, route: route, pathItems: pathItems, mext: mext, vm: vm}, err
+	ev := evaluator.NewEvaluator()
+	ev.Set("fake", jsf.Fake)
+	ev.Set("pathItems", pathItems)
+	return RouteDef{doc: doc, route: route, pathItems: pathItems, mext: mext, evaluator: ev}, err
 }
 
 func (r *RouteDef) OperationID() string {
@@ -41,7 +40,7 @@ func (r *RouteDef) OperationID() string {
 }
 
 func (r *RouteDef) Process(ctx context.Context, req *util.Request) (*util.Response, error) {
-	util.UpdateVmWithRequest(req, r.vm)
+	r.evaluator.WithRequest(req)
 	if r.mext.ValidateRequest {
 		r.setValidationError(r.validateRequest(ctx, req))
 
@@ -49,7 +48,7 @@ func (r *RouteDef) Process(ctx context.Context, req *util.Request) (*util.Respon
 	res := util.NewResponse()
 	var err error
 	if r.mext.Playback {
-		key, err := r.vm.RunString(r.mext.RecordingKey)
+		key, err := r.evaluator.RunString(r.mext.RecordingKey)
 		if err != nil {
 			return res, err
 		}
@@ -87,13 +86,13 @@ func (r *RouteDef) Process(ctx context.Context, req *util.Request) (*util.Respon
 			return res, err
 		}
 	}
-	_ = r.vm.Set("status", res.Status)
+	r.evaluator.Set("status", res.Status)
 	if r.mext.Record {
 		data, err := json.Marshal(res)
 		if err != nil {
 			return res, err
 		}
-		key, err := r.vm.RunString(r.mext.RecordingKey)
+		key, err := r.evaluator.RunString(r.mext.RecordingKey)
 		if err != nil {
 			return res, err
 		}
@@ -128,7 +127,7 @@ func (r *RouteDef) validateRequest(ctx context.Context, req *util.Request) error
 func (r *RouteDef) setValidationError(err error) {
 	r.validationError = err
 	if r.validationError != nil {
-		_ = r.vm.Set("error", "validation_error")
+		r.evaluator.Set("error", "validation_error")
 	}
 }
 
@@ -156,12 +155,12 @@ func (r *RouteDef) selectResponse() (*ResponseDef, error) {
 	// If, on the contrary, the response selector is a string, therefore a script, then it means that the validation
 	// error MAY be handled
 	if r.mext.ResponseSelector != nil {
-		val, err := r.vm.RunString(*r.mext.ResponseSelector)
+		val, err := r.evaluator.RunString(*r.mext.ResponseSelector)
 		if err != nil {
 			return nil, err
 		}
 		status = int(val.ToInteger())
 	}
-	def, err := NewResponseDef(r.route.Operation.Responses.Value(fmt.Sprintf("%d", status)).Value, status, r.mext, r.vm)
+	def, err := NewResponseDef(r.route.Operation.Responses.Value(fmt.Sprintf("%d", status)).Value, status, r.mext, r.evaluator)
 	return &def, err
 }
