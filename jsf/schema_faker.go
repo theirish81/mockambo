@@ -117,6 +117,10 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 			if mext.Faker != nil {
 				return Fake(*mext.Faker), nil
 			}
+		case "template":
+			if mext.Template != nil {
+				return ev.Template(*mext.Template)
+			}
 		case "schema":
 			if schema.Type.Includes(openapi3.TypeString) {
 				return generateString(schema, mext)

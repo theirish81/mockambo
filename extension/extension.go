@@ -20,11 +20,12 @@ type Mext struct {
 	LatencyMax             string   `yaml:"latencyMax"`
 	ResponseSelector       *string  `yaml:"responseSelector"`
 	Faker                  *string  `yaml:"faker"`
+	Template               *string  `yaml:"template"`
 }
 
 func NewDefaultMextFromExtensions(extensions map[string]any) (Mext, error) {
 	mext := Mext{
-		PayloadGenerationModes: []string{"script", "faker", "default", "example", "schema"},
+		PayloadGenerationModes: []string{"script", "template", "faker", "default", "example", "schema"},
 		ValidateRequest:        true,
 		ValidateResponse:       true,
 		Display:                false,
@@ -50,6 +51,7 @@ func MergeDefaultMextWithExtensions(def Mext, extensions map[string]any) (Mext, 
 	def.Display = false
 	def.ResponseSelector = nil
 	def.Faker = nil
+	def.Template = nil
 	modes := def.PayloadGenerationModes
 	def.PayloadGenerationModes = make([]string, len(def.PayloadGenerationModes))
 	copy(def.PayloadGenerationModes, modes)

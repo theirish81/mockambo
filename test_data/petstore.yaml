@@ -209,8 +209,11 @@ paths:
             application/json:
               schema:
                 x-mockambo:
-                  script: |-
-                    load('test_data/sample_payload.json')
+                  template: |-
+                    {
+                      "path": "{{path}}",
+                      "error": "invalid request"
+                    }
                 required:
                   - error
                   - path
