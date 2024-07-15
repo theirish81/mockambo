@@ -36,6 +36,13 @@ func (r ResponseDef) determineMediaType() string {
 
 func (r ResponseDef) generateResponsePayload(mext extension.Mext) (any, error) {
 	if mediaType := r.determineMediaType(); mediaType != "" {
+		mext, err := extension.MergeDefaultMextWithExtensions(mext, r.r.Content[mediaType].Extensions)
+		if err != nil {
+			return nil, err
+		}
+		if r.r.Content[mediaType].Schema == nil {
+			return nil, nil
+		}
 		return jsf.GenerateDataFromSchema(r.r.Content[mediaType].Schema.Value, mext, r.evaluator)
 	}
 	return nil, nil

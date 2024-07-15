@@ -14,10 +14,20 @@ import (
 const RFC3339local = "2006-01-02T15:04:05Z"
 
 func GenerateDataFromSchema(schema *openapi3.Schema, defaultMext extension.Mext, ev evaluator.Evaluator) (any, error) {
-	mext, err := extension.MergeDefaultMextWithExtensions(defaultMext, schema.Extensions)
-	if err != nil {
-		return nil, err
+	if schema == nil {
+		schema = &openapi3.Schema{}
 	}
+	var mext extension.Mext
+	if schema.Extensions != nil {
+		mx, err := extension.MergeDefaultMextWithExtensions(defaultMext, schema.Extensions)
+		if err != nil {
+			return nil, err
+		}
+		mext = mx
+	} else {
+		mext = defaultMext
+	}
+
 	return generateByPriority(schema, mext, ev)
 }
 

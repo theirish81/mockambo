@@ -52,8 +52,8 @@ func (r *RouteDef) Process(ctx context.Context, req *util.Request) (*util.Respon
 		if err != nil {
 			return res, err
 		}
-		if data, err := db.Get(key.String(), r.mext.RecordingPath); err == nil {
-			log.Println("serving recorded content for key:", key.String())
+		if data, err := db.Get(key.(string), r.mext.RecordingPath); err == nil {
+			log.Println("serving recorded content for key:", key.(string))
 			err = json.Unmarshal(data, res)
 			if err != nil {
 				return res, err
@@ -96,8 +96,8 @@ func (r *RouteDef) Process(ctx context.Context, req *util.Request) (*util.Respon
 		if err != nil {
 			return res, err
 		}
-		log.Println("recording content with key:", key.String())
-		if err := db.Upsert(key.String(), data, r.mext.RecordingPath); err != nil {
+		log.Println("recording content with key:", key.(string))
+		if err := db.Upsert(key.(string), data, r.mext.RecordingPath); err != nil {
 			return res, err
 		}
 	}
@@ -138,9 +138,12 @@ func (r *RouteDef) validateResponse(ctx context.Context, bundle *util.Response) 
 		Header:                 bundle.Headers,
 	}
 	var data []byte
-	if dx, ok := bundle.Payload.([]byte); ok {
-		data = dx
-	} else {
+	switch t := bundle.Payload.(type) {
+	case []byte:
+		data = t
+	case string:
+		data = []byte(t)
+	default:
 		data, _ = json.Marshal(bundle.Payload)
 	}
 	responseValidationInput.SetBodyBytes(data)
@@ -159,7 +162,7 @@ func (r *RouteDef) selectResponse() (*ResponseDef, error) {
 		if err != nil {
 			return nil, err
 		}
-		status = int(val.ToInteger())
+		status = int(val.(int64))
 	}
 	def, err := NewResponseDef(r.route.Operation.Responses.Value(fmt.Sprintf("%d", status)).Value, status, r.mext, r.evaluator)
 	return &def, err

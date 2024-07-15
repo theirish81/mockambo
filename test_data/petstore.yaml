@@ -205,6 +205,17 @@ paths:
                 $ref: '#/components/schemas/Pet'
         '400':
           description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                x-mockambo:
+                  script: |-
+                    load('test_data/sample_payload.json')
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
         '404':
           description: Pet not found
       security:
@@ -704,7 +715,7 @@ components:
           items:
             type: string
             x-mockambo:
-              script: "'http://example.com/'+pathItems.petId+'/'+fake('int')"
+              script: "`http://example.com/${pathItems.petId}/${fake('integer')}`"
         tags:
           type: array
           items:

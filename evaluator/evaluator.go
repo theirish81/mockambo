@@ -3,6 +3,7 @@ package evaluator
 import (
 	"github.com/dop251/goja"
 	"mockambo/util"
+	"os"
 )
 
 type Evaluator struct {
@@ -12,6 +13,7 @@ type Evaluator struct {
 func NewEvaluator() Evaluator {
 	ev := Evaluator{vm: goja.New()}
 	_ = ev.vm.Set("error", "")
+	_ = ev.vm.Set("load", ev.Load)
 	return ev
 }
 
@@ -26,6 +28,15 @@ func (e *Evaluator) WithRequest(req *util.Request) {
 	e.Set("method", req.Method)
 }
 
-func (e *Evaluator) RunString(script string) (goja.Value, error) {
-	return e.vm.RunString(script)
+func (e *Evaluator) RunString(script string) (any, error) {
+	v, err := e.vm.RunString(script)
+	return v.Export(), err
+}
+
+func (e *Evaluator) Load(path string) (string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
