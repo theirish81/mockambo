@@ -5,13 +5,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"mockambo/util"
 	"net/http"
-	"os"
 	"testing"
 )
 
 func TestResponseDef_GenerateResponseBundle(t *testing.T) {
-	data, _ := os.ReadFile("../test_data/petstore.yaml")
-	doc, _ := NewDoc(data)
+	doc, _ := NewDoc("../test_data/petstore.yaml")
 	r, _ := http.NewRequest("GET", "http://example.com/api/v3/pet/123", nil)
 	req := util.NewRequest(r)
 	route, _ := doc.FindRoute(req)

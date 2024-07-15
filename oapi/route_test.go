@@ -5,13 +5,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"mockambo/util"
 	"net/http"
-	"os"
 	"testing"
 )
 
 func TestRouteDef_SelectResponse(t *testing.T) {
-	data, _ := os.ReadFile("../test_data/petstore.yaml")
-	doc, _ := NewDoc(data)
+	doc, _ := NewDoc("../test_data/petstore.yaml")
 	req, _ := http.NewRequest("GET", "http://example.com/api/v3/pet/123", nil)
 	request := util.NewRequest(req)
 	route, _ := doc.FindRoute(request)
@@ -35,8 +33,7 @@ func TestRouteDef_SelectResponse(t *testing.T) {
 }
 
 func TestRouteDef_Process(t *testing.T) {
-	data, _ := os.ReadFile("../test_data/petstore.yaml")
-	doc, _ := NewDoc(data)
+	doc, _ := NewDoc("../test_data/petstore.yaml")
 	req, _ := http.NewRequest("GET", "http://example.com/api/v3/pet/123", nil)
 	request := util.NewRequest(req)
 	route, _ := doc.FindRoute(request)
