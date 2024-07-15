@@ -18,7 +18,7 @@ import (
 )
 
 type RouteDef struct {
-	doc                    Doc
+	doc                    *Doc
 	route                  *routers.Route
 	pathItems              map[string]string
 	requestValidationInput *openapi3filter.RequestValidationInput
@@ -27,7 +27,7 @@ type RouteDef struct {
 	vm                     *goja.Runtime
 }
 
-func NewRouteDef(doc Doc, route *routers.Route, pathItems map[string]string) (RouteDef, error) {
+func NewRouteDef(doc *Doc, route *routers.Route, pathItems map[string]string) (RouteDef, error) {
 	mext, err := extension.MergeDefaultMextWithExtensions(doc.defaultMext, route.Operation.Extensions)
 	vm := goja.New()
 	jsf.InstrumentVM(vm)

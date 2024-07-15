@@ -20,6 +20,8 @@ func Proxy(req *http.Request, servers []string, server2 string) (*util.Response,
 	}
 	req2.Header = req.Header
 	req2.Header.Set("host", u.Hostname())
+	req2.Header.Del("Transfer-Encoding")
+	req2.Header.Del("Accept-Encoding")
 	r, err := httpClient.Do(req2)
 	if err != nil {
 		return res, err
