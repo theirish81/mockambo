@@ -213,8 +213,11 @@ paths:
                     load('test_data/sample_payload.json')
                 required:
                   - error
+                  - path
                 properties:
                   error:
+                    type: string
+                  path:
                     type: string
         '404':
           description: Pet not found

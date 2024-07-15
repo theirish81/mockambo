@@ -3,12 +3,7 @@ package jsf
 import (
 	"fmt"
 	"github.com/brianvoe/gofakeit"
-	"github.com/dop251/goja"
 )
-
-func InstrumentVM(vm *goja.Runtime) {
-	_ = vm.Set("fake", Fake)
-}
 
 func Fake(t string) any {
 	switch t {
