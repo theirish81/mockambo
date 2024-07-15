@@ -30,6 +30,9 @@ func (e *Evaluator) WithRequest(req *util.Request) {
 
 func (e *Evaluator) RunString(script string) (any, error) {
 	v, err := e.vm.RunString(script)
+	if err != nil {
+		return nil, err
+	}
 	return v.Export(), err
 }
 
