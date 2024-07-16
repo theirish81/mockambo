@@ -16,4 +16,7 @@ Mockambo is a powerful *Swiss Army knife* for the following activities:
 * Service isolation during development and testing
 * Contract testing of both clients and servers
 * Offline development
+* CI/CD pipeline testing
 
+## Status
+The project is in its infancy and still has to hit the first release.
