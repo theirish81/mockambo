@@ -1,4 +1,5 @@
-# Mockambo - API Mocking and Validation
+# Mockambo
+## API Mocking, recording and Validation
 Mockambo is an API mocking server that packs a lot of useful feature to:
 * generate mocked APIs on the fly based on **OpenAPI specifications** without additional configuration
 * Validate requests and responses against the contract
