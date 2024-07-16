@@ -20,3 +20,6 @@ Mockambo is a powerful *Swiss Army knife* for the following activities:
 
 ## Status
 The project is in its infancy and still has to hit the first release.
+
+## Documentation
+For further information, documentation and HowTos, [please refer to the project wiki](https://github.com/theirish81/mockambo/wiki).
