@@ -2,10 +2,10 @@ package jsf
 
 import (
 	"github.com/brianvoe/gofakeit"
-	"github.com/dop251/goja"
 	"github.com/getkin/kin-openapi/openapi3"
 	regen "github.com/zach-klippenstein/goregen"
 	"math/rand"
+	"mockambo/evaluator"
 	"mockambo/extension"
 	"mockambo/util"
 	"slices"
@@ -13,12 +13,22 @@ import (
 
 const RFC3339local = "2006-01-02T15:04:05Z"
 
-func GenerateDataFromSchema(schema *openapi3.Schema, defaultMext extension.Mext, vm *goja.Runtime) (any, error) {
-	mext, err := extension.MergeDefaultMextWithExtensions(defaultMext, schema.Extensions)
-	if err != nil {
-		return nil, err
+func GenerateDataFromSchema(schema *openapi3.Schema, defaultMext extension.Mext, ev evaluator.Evaluator) (any, error) {
+	if schema == nil {
+		schema = &openapi3.Schema{}
 	}
-	return generateByPriority(schema, mext, vm)
+	var mext extension.Mext
+	if schema.Extensions != nil {
+		mx, err := extension.MergeDefaultMextWithExtensions(defaultMext, schema.Extensions)
+		if err != nil {
+			return nil, err
+		}
+		mext = mx
+	} else {
+		mext = defaultMext
+	}
+
+	return generateByPriority(schema, mext, ev)
 }
 
 func generateString(s *openapi3.Schema, mext extension.Mext) (string, error) {
@@ -89,7 +99,7 @@ func generateFloat(schema *openapi3.Schema, mext extension.Mext) float64 {
 	return v
 }
 
-func generateByPriority(schema *openapi3.Schema, mext extension.Mext, vm *goja.Runtime) (any, error) {
+func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluator.Evaluator) (any, error) {
 	if schema.Enum != nil {
 		return schema.Enum[rand.Intn(len(schema.Enum))], nil
 	}
@@ -106,6 +116,10 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, vm *goja.R
 		case "faker":
 			if mext.Faker != nil {
 				return Fake(*mext.Faker), nil
+			}
+		case "template":
+			if mext.Template != nil {
+				return ev.Template(*mext.Template)
 			}
 		case "schema":
 			if schema.Type.Includes(openapi3.TypeString) {
@@ -132,7 +146,7 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, vm *goja.R
 					}
 					if mx.Display || util.RequiredOrRandom(slices.Contains(schema.Required, k)) {
 						var err error
-						if res[k], err = GenerateDataFromSchema(p.Value, mx, vm); err != nil {
+						if res[k], err = GenerateDataFromSchema(p.Value, mx, ev); err != nil {
 							return res, err
 						}
 					}
@@ -154,7 +168,7 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, vm *goja.R
 					count = 1
 				}
 				for range count {
-					item, err := GenerateDataFromSchema(schema.Items.Value, mext, vm)
+					item, err := GenerateDataFromSchema(schema.Items.Value, mext, ev)
 					res = append(res, item)
 					if err != nil {
 						return res, err
@@ -165,7 +179,7 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, vm *goja.R
 			}
 		case "script":
 			if mext.Script != nil {
-				return vm.RunString(*mext.Script)
+				return ev.RunString(*mext.Script)
 			}
 		}
 	}

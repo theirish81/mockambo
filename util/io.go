@@ -57,10 +57,15 @@ func WriteJSON(ctx echo.Context, res *Response) error {
 		ctx.Response().Header().Set(k, res.Headers.Get(k))
 	}
 	if res.Payload != nil {
-		if data, ok := res.Payload.([]byte); ok {
-			return ctx.Blob(res.Status, res.ContentType, data)
+		switch t := res.Payload.(type) {
+		case []byte:
+			return ctx.Blob(res.Status, res.ContentType, t)
+		case string:
+			return ctx.Blob(res.Status, res.ContentType, []byte(t))
+		default:
+			return ctx.JSON(res.Status, res.Payload)
 		}
-		return ctx.JSON(res.Status, res.Payload)
+
 	} else {
 		return ctx.NoContent(res.Status)
 	}
