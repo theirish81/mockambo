@@ -1,0 +1,32 @@
+name: Go
+
+on:
+  push:
+    tags:
+      - v*
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+      - name: Test
+        run: |
+          go test ./...
+      - name: Build
+        run: |
+          mkdir target
+          GOOS=linux GOARCH=amd64 go build -o target/mockambo-linux -v .
+          GOOS=windows GOARCH=amd64 go build -o target/mockambo.exe -v .
+          GOOS=darwin GOARCH=amd64 go build -o target/mockambo-darwin-amd64 -v .
+          GOOS=darwin GOARCH=arm64 go build -o target/mockambo-darwin-arm64 -v .
+      - name: GitHub Releases
+        uses: fnkr/github-action-ghr@v1.3
+        env:
+          GHR_PATH: target/
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
