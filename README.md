@@ -1,10 +1,10 @@
 # Mockambo
 ## API Mocking, recording and Validation
-Mockambo is an API mocking server that packs a lot of useful feature to:
+Mockambo is an API mocking server that packs a lot of useful features to:
 * generate mocked APIs on the fly based on **OpenAPI specifications** without additional configuration
 * Validate requests and responses against the contract
 * Fake data coherently
-* Script mocks behaviors using JavaScript to make **dynamic mocks**
+* Script the behavior of the mocks using JavaScript
 * Load dynamic templates to make the mocks **even more *alive***
 * Work as a **reverse proxy** request/response **recorder and playback**
 
