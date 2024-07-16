@@ -34,6 +34,7 @@ func NewRequest(req *http.Request) *Request {
 	request.Url = req.URL.String()
 	request.Headers = req.Header
 	request.CreatedAt = time.Now()
+	request.Method = req.Method
 	return &request
 }
 

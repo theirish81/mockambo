@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/getkin/kin-openapi/routers"
@@ -164,6 +165,14 @@ func (r *RouteDef) selectResponse() (*ResponseDef, error) {
 		}
 		status = int(val.(int64))
 	}
-	def, err := NewResponseDef(r.route.Operation.Responses.Value(fmt.Sprintf("%d", status)).Value, status, r.mext, r.evaluator)
-	return &def, err
+	selector := fmt.Sprintf("%d", status)
+	if res := r.route.Operation.Responses.Value(selector); res != nil {
+		def, err := NewResponseDef(res.Value, status, r.mext, r.evaluator)
+		return &def, err
+	} else if res := r.route.Operation.Responses.Value("default"); res != nil {
+		def, err := NewResponseDef(res.Value, status, r.mext, r.evaluator)
+		return &def, err
+	}
+
+	return nil, errors.New("route not found")
 }

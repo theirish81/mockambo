@@ -703,7 +703,7 @@ components:
         id:
           type: integer
           x-mockambo:
-            script: "parseInt(pathItems.petId)"
+            script: "pathItems.petId ? parseInt(pathItems.petId): 0"
             display: true
           format: int64
           example: 10
