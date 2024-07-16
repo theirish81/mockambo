@@ -165,7 +165,7 @@ func (r *RouteDef) selectResponse() (*ResponseDef, error) {
 		}
 		status = int(val.(int64))
 	}
-	selector := fmt.Sprintf("%d")
+	selector := fmt.Sprintf("%d", status)
 	if res := r.route.Operation.Responses.Value(selector); res != nil {
 		def, err := NewResponseDef(res.Value, status, r.mext, r.evaluator)
 		return &def, err
