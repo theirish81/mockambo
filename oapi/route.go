@@ -15,6 +15,7 @@ import (
 	"mockambo/jsf"
 	"mockambo/proxy"
 	"mockambo/util"
+	"strconv"
 	"time"
 )
 
@@ -172,6 +173,13 @@ func (r *RouteDef) selectResponse() (*ResponseDef, error) {
 	} else if res := r.route.Operation.Responses.Value("default"); res != nil {
 		def, err := NewResponseDef(res.Value, status, r.mext, r.evaluator)
 		return &def, err
+	} else {
+		for k, _ := range r.route.Operation.Responses.Map() {
+			val, _ := strconv.Atoi(k)
+			def, err := NewResponseDef(r.route.Operation.Responses.Value(k).Value, val, r.mext, r.evaluator)
+			return &def, err
+		}
+
 	}
 
 	return nil, errors.New("route not found")
