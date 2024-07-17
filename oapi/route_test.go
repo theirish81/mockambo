@@ -37,6 +37,13 @@ func TestRouteDef_SelectResponse(t *testing.T) {
 	res, err := route.selectResponse()
 	assert.Nil(t, err)
 	assert.Equal(t, 200, res.status)
+
+	req, _ = http.NewRequest("DELETE", "http://example.com/api/v3/pet/abc", nil)
+	request = util.NewRequest(req)
+	route, err = doc.FindRoute(request)
+	res, err = route.selectResponse()
+	assert.Nil(t, err)
+	assert.Equal(t, 400, res.status)
 }
 
 func TestRouteDef_Process(t *testing.T) {
