@@ -51,7 +51,7 @@ func generateString(s *openapi3.Schema, mext extension.Mext) (string, error) {
 		switch s.Format {
 		case "date-time":
 			return gofakeit.Date().Format(RFC3339local), nil
-		case "uri-template":
+		case "uri-template", "uri":
 			return gofakeit.URL(), nil
 		}
 	} else {
@@ -137,6 +137,19 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 			if schema.Type.Includes(openapi3.TypeBoolean) {
 				return gofakeit.Bool(), nil
 			}
+
+			if schema.OneOf != nil {
+				return GenerateDataFromSchema(schema.OneOf[rand.Intn(len(schema.OneOf))].Value, mext, ev)
+			}
+			if schema.AnyOf != nil {
+				return GenerateDataFromSchema(schema.OneOf[rand.Intn(len(schema.AnyOf))].Value, mext, ev)
+			}
+			if schema.AllOf != nil {
+				sx := &openapi3.Schema{}
+				Merge(schema.AllOf, 0, sx)
+				return GenerateDataFromSchema(sx, mext, ev)
+			}
+
 			if schema.Type.Includes(openapi3.TypeObject) {
 				res := make(map[string]any)
 				for k, p := range schema.Properties {

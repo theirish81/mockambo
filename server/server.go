@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"log"
+	"mockambo/exceptions"
 	"mockambo/oapi"
 	"mockambo/util"
 	"net/http"
@@ -23,7 +24,12 @@ func NewServer(port int, doc *oapi.Doc) Server {
 	server.e.Any("/**", server.handler)
 	server.e.HTTPErrorHandler = func(err error, c echo.Context) {
 		c.Response().Header().Set("X-Mockambo", "true")
-		_ = c.JSON(http.StatusInternalServerError, map[string]any{"message": err.Error()})
+		switch t := err.(type) {
+		case *exceptions.MockamboError:
+			_ = c.JSON(http.StatusInternalServerError, t)
+		default:
+			_ = c.JSON(http.StatusInternalServerError, map[string]any{"source": "mockambo", "message": err.Error()})
+		}
 	}
 	return server
 }
@@ -33,7 +39,7 @@ func (s Server) handler(ctx echo.Context) error {
 	req := util.NewRequest(ctx.Request())
 	route, err := s.doc.FindRoute(req)
 	if err != nil {
-		return err
+		return exceptions.Wrap("find_route", err)
 	}
 	res, err := route.Process(ctx.Request().Context(), req)
 	if err != nil {

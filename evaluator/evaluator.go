@@ -3,6 +3,7 @@ package evaluator
 import (
 	"github.com/cbroglie/mustache"
 	"github.com/dop251/goja"
+	"mockambo/exceptions"
 	"mockambo/util"
 	"os"
 )
@@ -34,19 +35,23 @@ func (e *Evaluator) WithRequest(req *util.Request) {
 func (e *Evaluator) RunString(script string) (any, error) {
 	v, err := e.vm.RunString(script)
 	if err != nil {
-		return nil, err
+		return nil, exceptions.Wrap("evaluate", err)
 	}
 	val := v.Export()
 	if val, ok := val.(string); ok {
-		return e.Template(val)
+		t, err := e.Template(val)
+		if err != nil {
+			err = exceptions.Wrap("template", err)
+		}
+		return t, err
 	}
-	return val, err
+	return val, nil
 }
 
 func (e *Evaluator) Load(path string) (string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return "", err
+		return "", exceptions.Wrap("load", err)
 	}
 	return string(data), nil
 }
