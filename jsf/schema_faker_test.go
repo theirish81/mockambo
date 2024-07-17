@@ -14,6 +14,7 @@ func TestGenerate(t *testing.T) {
 	path := doc.Paths.Value("/pet/{petId}")
 	mext, _ := extension.NewDefaultMextFromExtensions(nil)
 	ev := evaluator.NewEvaluator()
+	ev.Set("fake", Fake)
 	ev.Set("pathItems", map[string]any{"petId": 123})
 	out, _ := GenerateDataFromSchema(path.Get.Responses.Value("200").Value.Content.Get("application/json").Schema.Value, mext, ev)
 	assert.IsType(t, map[string]any{}, out)
