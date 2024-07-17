@@ -160,8 +160,8 @@ func (r *RouteDef) selectResponse() (*ResponseDef, error) {
 	// the request cannot be processed because of that.
 	// If, on the contrary, the response selector is a string, therefore a script, then it means that the validation
 	// error MAY be handled
-	if r.mext.ResponseSelector != nil {
-		val, err := r.evaluator.RunString(*r.mext.ResponseSelector)
+	if r.mext.ResponseSelector != "" {
+		val, err := r.evaluator.RunString(r.mext.ResponseSelector)
 		if err != nil {
 			return nil, err
 		}

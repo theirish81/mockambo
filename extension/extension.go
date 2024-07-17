@@ -9,7 +9,7 @@ const MockamboExt = "x-mockambo"
 
 type Mext struct {
 	PayloadGenerationModes []string `yaml:"payloadGenerationModes"`
-	Script                 *string  `yaml:"script"`
+	Script                 string   `yaml:"script"`
 	ValidateRequest        bool     `yaml:"validateRequest"`
 	ValidateResponse       bool     `yaml:"validateResponse"`
 	Display                bool     `yaml:"display"`
@@ -21,9 +21,9 @@ type Mext struct {
 	RecordingPath          string   `yaml:"recordingPath"`
 	LatencyMin             string   `yaml:"latencyMin"`
 	LatencyMax             string   `yaml:"latencyMax"`
-	ResponseSelector       *string  `yaml:"responseSelector"`
-	Faker                  *string  `yaml:"faker"`
-	Template               *string  `yaml:"template"`
+	ResponseSelector       string   `yaml:"responseSelector"`
+	Faker                  string   `yaml:"faker"`
+	Template               string   `yaml:"template"`
 }
 
 func NewDefaultMextFromExtensions(extensions map[string]any) (Mext, error) {
@@ -50,11 +50,7 @@ func NewDefaultMextFromExtensions(extensions map[string]any) (Mext, error) {
 }
 
 func MergeDefaultMextWithExtensions(def Mext, extensions map[string]any) (Mext, error) {
-	def.Script = nil
 	def.Display = false
-	def.ResponseSelector = nil
-	def.Faker = nil
-	def.Template = nil
 	modes := def.PayloadGenerationModes
 	def.PayloadGenerationModes = make([]string, len(def.PayloadGenerationModes))
 	copy(def.PayloadGenerationModes, modes)

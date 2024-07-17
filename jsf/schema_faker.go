@@ -114,12 +114,12 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 				return schema.Example, nil
 			}
 		case "faker":
-			if mext.Faker != nil {
-				return Fake(*mext.Faker), nil
+			if mext.Faker != "" {
+				return Fake(mext.Faker), nil
 			}
 		case "template":
-			if mext.Template != nil {
-				return ev.Template(*mext.Template)
+			if mext.Template != "" {
+				return ev.Template(mext.Template)
 			}
 		case "schema":
 			if schema.Type.Includes(openapi3.TypeString) {
@@ -191,8 +191,8 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 				return res, nil
 			}
 		case "script":
-			if mext.Script != nil {
-				return ev.RunString(*mext.Script)
+			if mext.Script != "" {
+				return ev.RunString(mext.Script)
 			}
 		}
 	}
