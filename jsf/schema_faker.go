@@ -51,7 +51,7 @@ func generateString(s *openapi3.Schema, mext extension.Mext) (string, error) {
 		switch s.Format {
 		case "date-time":
 			return gofakeit.Date().Format(RFC3339local), nil
-		case "uri-template":
+		case "uri-template", "uri":
 			return gofakeit.URL(), nil
 		}
 	} else {
