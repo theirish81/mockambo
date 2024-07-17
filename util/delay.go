@@ -2,6 +2,7 @@ package util
 
 import (
 	"math/rand"
+	"mockambo/exceptions"
 	"mockambo/extension"
 	"time"
 )
@@ -11,11 +12,11 @@ func ComputeLatency(mext extension.Mext, req *Request) (time.Duration, error) {
 	elapsed := time.Now().Sub(req.CreatedAt)
 	latencyMin, err := time.ParseDuration(mext.LatencyMin)
 	if err != nil {
-		return sleepTime, err
+		return sleepTime, exceptions.Wrap("parse_latency_min", err)
 	}
 	latencyMax, err := time.ParseDuration(mext.LatencyMax)
 	if err != nil {
-		return sleepTime, err
+		return sleepTime, exceptions.Wrap("parse_latency_max", err)
 	}
 	if elapsed < latencyMin {
 		rx := latencyMax - latencyMin

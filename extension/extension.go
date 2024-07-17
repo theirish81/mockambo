@@ -1,6 +1,9 @@
 package extension
 
-import "github.com/mitchellh/mapstructure"
+import (
+	"github.com/mitchellh/mapstructure"
+	"mockambo/exceptions"
+)
 
 const MockamboExt = "x-mockambo"
 
@@ -57,7 +60,7 @@ func MergeDefaultMextWithExtensions(def Mext, extensions map[string]any) (Mext, 
 	copy(def.PayloadGenerationModes, modes)
 	if ext, ok := extensions[MockamboExt]; ok {
 		if err := mapstructure.Decode(ext.(map[string]any), &def); err != nil {
-			return def, err
+			return def, exceptions.Wrap("decode_extension", err)
 		}
 	}
 	return def, nil
