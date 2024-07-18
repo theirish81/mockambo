@@ -37,7 +37,7 @@ func Proxy(req *http.Request, servers []string, server2 string) (*util.Response,
 	}()
 
 	res.Status = r.StatusCode
-	res.ContentType = r.Header.Get(util.HeaderContentType)
+	res.ContentType = r.Header.Get("Content-Type")
 	res.Headers = r.Header
 	res.Payload, err = io.ReadAll(r.Body)
 	return res, exceptions.Wrap("read_body", err)

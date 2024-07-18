@@ -78,7 +78,7 @@ func (r ResponseDef) GenerateResponse(mext extension.Mext) (*util.Response, erro
 		return res, err
 	}
 	res.ContentType = r.determineJsonMediaType()
-	res.Headers.Set(util.HeaderContentType, res.ContentType)
+	res.Headers.Set("Content-Type", res.ContentType)
 	res.Status = r.status
 	if res.Payload, err = r.generateResponsePayload(mext); err != nil {
 		return res, err
