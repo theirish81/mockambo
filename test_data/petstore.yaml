@@ -174,7 +174,7 @@ paths:
       description: Returns a single pet
       operationId: getPetById
       x-mockambo:
-        responseSelector: |-
+        responseSelectorScript: |-
           if(error == "validation_error")
             400
           else

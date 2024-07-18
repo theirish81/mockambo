@@ -30,7 +30,7 @@ type Mext struct {
 	RecordingPath            string   `yaml:"recordingPath"`
 	LatencyMin               string   `yaml:"latencyMin"`
 	LatencyMax               string   `yaml:"latencyMax"`
-	ResponseSelector         string   `yaml:"responseSelector"`
+	ResponseSelectorScript   string   `yaml:"responseSelectorScript"`
 	Faker                    string   `yaml:"faker"`
 	Template                 string   `yaml:"template"`
 }
@@ -48,7 +48,7 @@ func NewMextFromExtensions(extensions map[string]any) (Mext, error) {
 		ProxyServerIndex:         0,
 		Record:                   false,
 		Playback:                 false,
-		RecordingSignatureScript: "method+'_'+url",
+		RecordingSignatureScript: "`${method}_${url}`",
 		RecordingPath:            "recording",
 		LatencyMin:               "0s",
 		LatencyMax:               "0s",

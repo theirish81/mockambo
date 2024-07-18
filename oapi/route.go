@@ -172,13 +172,13 @@ func (r *RouteDef) validateResponse(ctx context.Context, response *util.Response
 
 func (r *RouteDef) selectResponse() (*ResponseDef, error) {
 	status := 200
-	// if ResponseSelector is empty, it implies that a validation error is not managed by a script.
+	// if ResponseSelectorScript is empty, it implies that a validation error is not managed by a script.
 	// Therefore, if a validation error is present, we need to stop the process and let the user know that
 	// the request cannot be processed because of that.
 	// If, on the contrary, the response selector is a string, therefore a script, then it means that the validation
 	// error MAY be handled
-	if r.mext.ResponseSelector != "" {
-		val, err := r.evaluator.RunScript(r.mext.ResponseSelector)
+	if r.mext.ResponseSelectorScript != "" {
+		val, err := r.evaluator.RunScript(r.mext.ResponseSelectorScript)
 		if err != nil {
 			return nil, err
 		}
