@@ -7,6 +7,13 @@ import (
 
 const MockamboExt = "x-mockambo"
 
+const ModeScript = "script"
+const ModeTemplate = "template"
+const ModeFaker = "faker"
+const ModeDefault = "default"
+const ModeExample = "example"
+const ModeSchema = "schema"
+
 // Mext is the data structure representing the x-mockambo OpenAPI extension.
 // No fields are pointers to simplify the effects of cloning
 type Mext struct {
@@ -33,7 +40,7 @@ type Mext struct {
 // within the extensions map
 func NewMextFromExtensions(extensions map[string]any) (Mext, error) {
 	mext := Mext{
-		PayloadGenerationModes:   []string{"script", "template", "faker", "default", "example", "schema"},
+		PayloadGenerationModes:   []string{ModeScript, ModeTemplate, ModeFaker, ModeDefault, ModeExample, ModeSchema},
 		ValidateRequest:          true,
 		ValidateResponse:         true,
 		Display:                  false,

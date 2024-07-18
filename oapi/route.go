@@ -35,8 +35,8 @@ type RouteDef struct {
 func NewRouteDef(doc *Doc, route *routers.Route, pathItems map[string]string) (RouteDef, error) {
 	mext, err := extension.MergeMextWithExtensions(doc.defaultMext, route.Operation.Extensions)
 	ev := evaluator.NewEvaluator()
-	ev.Set("fake", jsf.Fake)
-	ev.Set("pathItems", pathItems)
+	ev.Set(evaluator.VarFake, jsf.Fake)
+	ev.Set(evaluator.VarPathItems, pathItems)
 	return RouteDef{doc: doc, route: route, pathItems: pathItems, mext: mext, evaluator: ev}, err
 }
 
@@ -99,7 +99,7 @@ func (r *RouteDef) Process(ctx context.Context, req *util.Request) (*util.Respon
 			return res, exceptions.Wrap("validate_response", err)
 		}
 	}
-	r.evaluator.Set("status", res.Status)
+	r.evaluator.Set(evaluator.VarStatus, res.Status)
 	if r.mext.Record {
 		data, err := json.Marshal(res)
 		if err != nil {

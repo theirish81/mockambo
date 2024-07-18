@@ -112,23 +112,23 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 	}
 	for _, m := range mext.PayloadGenerationModes {
 		switch m {
-		case "default":
+		case extension.ModeDefault:
 			if schema.Default != nil {
 				return schema.Default, nil
 			}
-		case "example":
+		case extension.ModeExample:
 			if schema.Example != nil {
 				return schema.Example, nil
 			}
-		case "faker":
+		case extension.ModeFaker:
 			if mext.Faker != "" {
 				return Fake(mext.Faker), nil
 			}
-		case "template":
+		case extension.ModeTemplate:
 			if mext.Template != "" {
 				return ev.Template(mext.Template)
 			}
-		case "schema":
+		case extension.ModeSchema:
 			if schema.Type.Includes(openapi3.TypeString) {
 				return generateString(schema, mext)
 			}
@@ -184,7 +184,7 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 				}
 				return res, nil
 			}
-		case "script":
+		case extension.ModeScript:
 			if mext.Script != "" {
 				return ev.RunScript(mext.Script)
 			}
