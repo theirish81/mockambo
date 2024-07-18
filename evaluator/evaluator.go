@@ -3,6 +3,7 @@ package evaluator
 import (
 	"github.com/cbroglie/mustache"
 	"github.com/dop251/goja"
+	"github.com/samber/lo"
 	"mockambo/exceptions"
 	"mockambo/util"
 	"os"
@@ -40,7 +41,9 @@ func (e *Evaluator) Set(key string, val any) {
 // WithRequest extracts important values from a util.Request and sets them in the scope of the evaluator
 func (e *Evaluator) WithRequest(req *util.Request) {
 	e.Set(VarUrl, req.Request().URL.String())
-	e.Set(VarQuery, req.Request().URL.Query())
+	e.Set(VarQuery, lo.MapValues[string, []string, string](req.Request().URL.Query(), func(value []string, key string) string {
+		return value[0]
+	}))
 	e.Set(VarPath, req.Request().URL.Path)
 	e.Set(VarMethod, req.Method)
 }
