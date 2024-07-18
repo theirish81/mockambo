@@ -1,8 +1,27 @@
 package jsf
 
-import "github.com/getkin/kin-openapi/openapi3"
+import (
+	"github.com/getkin/kin-openapi/openapi3"
+	"math/rand"
+)
 
-func Merge(allOf openapi3.SchemaRefs, index int, schema *openapi3.Schema) {
+func ComputeItemsCount(schema *openapi3.Schema) int {
+	mn := int(schema.MinItems)
+	mx := 1
+	if schema.MaxItems != nil {
+		mx = int(*schema.MaxItems)
+	}
+	count := mn
+	if mx > count {
+		count = rand.Intn(mx-mn) + mn
+	}
+	if count == 0 {
+		count = 1
+	}
+	return count
+}
+
+func MergeAllOf(allOf openapi3.SchemaRefs, index int, schema *openapi3.Schema) {
 	extract := allOf[index].Value
 	if extract.Type.Includes(openapi3.TypeObject) {
 		if schema.Properties == nil {
@@ -20,6 +39,6 @@ func Merge(allOf openapi3.SchemaRefs, index int, schema *openapi3.Schema) {
 		}
 	}
 	if index < len(allOf)-1 {
-		Merge(allOf, index+1, schema)
+		MergeAllOf(allOf, index+1, schema)
 	}
 }

@@ -13,13 +13,14 @@ import (
 
 const RFC3339local = "2006-01-02T15:04:05Z"
 
+// GenerateDataFromSchema recursively generates data from an OpenAPI schema
 func GenerateDataFromSchema(schema *openapi3.Schema, defaultMext extension.Mext, ev evaluator.Evaluator) (any, error) {
 	if schema == nil {
 		schema = &openapi3.Schema{}
 	}
 	var mext extension.Mext
 	if schema.Extensions != nil {
-		mx, err := extension.MergeDefaultMextWithExtensions(defaultMext, schema.Extensions)
+		mx, err := extension.MergeMextWithExtensions(defaultMext, schema.Extensions)
 		if err != nil {
 			return nil, err
 		}
@@ -31,6 +32,7 @@ func GenerateDataFromSchema(schema *openapi3.Schema, defaultMext extension.Mext,
 	return generateByPriority(schema, mext, ev)
 }
 
+// generateString generates a random string, respecting the requirements of the schema
 func generateString(s *openapi3.Schema, mext extension.Mext) (string, error) {
 	var err error
 	res := ""
@@ -68,6 +70,7 @@ func generateString(s *openapi3.Schema, mext extension.Mext) (string, error) {
 	return res, err
 }
 
+// generateInt generates a random integer, respecting the requirements of the schema
 func generateInt(schema *openapi3.Schema, mext extension.Mext) int {
 	mn := 0
 	mx := 100
@@ -80,6 +83,7 @@ func generateInt(schema *openapi3.Schema, mext extension.Mext) int {
 	return rand.Intn(mx-mn) + mn
 }
 
+// generateFloat generates a random float, respecting the requirements of the schema
 func generateFloat(schema *openapi3.Schema, mext extension.Mext) float64 {
 	var mn float64 = 0
 	var mx float64 = 100
@@ -99,6 +103,9 @@ func generateFloat(schema *openapi3.Schema, mext extension.Mext) float64 {
 	return v
 }
 
+// generateByPriority generates the right type of data based on the schema requirements.
+// Additionally, it will determine what's the correct generation methodology using the PayloadGenerationModes
+// priority system
 func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluator.Evaluator) (any, error) {
 	if schema.Enum != nil {
 		return schema.Enum[rand.Intn(len(schema.Enum))], nil
@@ -146,14 +153,14 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 			}
 			if schema.AllOf != nil {
 				sx := &openapi3.Schema{}
-				Merge(schema.AllOf, 0, sx)
+				MergeAllOf(schema.AllOf, 0, sx)
 				return GenerateDataFromSchema(sx, mext, ev)
 			}
 
 			if schema.Type.Includes(openapi3.TypeObject) {
 				res := make(map[string]any)
 				for k, p := range schema.Properties {
-					mx, err := extension.MergeDefaultMextWithExtensions(mext, p.Value.Extensions)
+					mx, err := extension.MergeMextWithExtensions(mext, p.Value.Extensions)
 					if err != nil {
 						return res, err
 					}
@@ -168,31 +175,18 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 			}
 			if schema.Type.Includes(openapi3.TypeArray) {
 				res := make([]any, 0)
-				mn := int(schema.MinItems)
-				mx := 1
-				if schema.MaxItems != nil {
-					mx = int(*schema.MaxItems)
-				}
-				count := mn
-				if mx > count {
-					count = rand.Intn(mx-mn) + mn
-				}
-				if count == 0 {
-					count = 1
-				}
-				for range count {
+				for range ComputeItemsCount(schema) {
 					item, err := GenerateDataFromSchema(schema.Items.Value, mext, ev)
 					res = append(res, item)
 					if err != nil {
 						return res, err
 					}
 				}
-
 				return res, nil
 			}
 		case "script":
 			if mext.Script != "" {
-				return ev.RunString(mext.Script)
+				return ev.RunScript(mext.Script)
 			}
 		}
 	}
