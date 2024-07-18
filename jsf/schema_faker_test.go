@@ -12,7 +12,7 @@ import (
 func TestGenerate(t *testing.T) {
 	doc, _ := openapi3.NewLoader().LoadFromFile("../test_data/petstore.yaml")
 	path := doc.Paths.Value("/pet/{petId}")
-	mext, _ := extension.NewDefaultMextFromExtensions(nil)
+	mext, _ := extension.NewMextFromExtensions(nil)
 	ev := evaluator.NewEvaluator()
 	ev.Set("fake", Fake)
 	ev.Set("pathItems", map[string]any{"petId": 123})

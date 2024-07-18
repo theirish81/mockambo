@@ -12,10 +12,10 @@ func TestEvaluator_Load(t *testing.T) {
 	assert.Greater(t, len(data), 0)
 }
 
-func TestEvaluator_RunString(t *testing.T) {
+func TestEvaluator_RunScript(t *testing.T) {
 	ev := NewEvaluator()
 	ev.Set("foo", "bar")
-	v, err := ev.RunString("foo")
+	v, err := ev.RunScript("foo")
 	assert.Nil(t, err)
 	assert.Equal(t, "bar", v)
 }

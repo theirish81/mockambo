@@ -10,6 +10,7 @@ import (
 	"mockambo/util"
 )
 
+// Doc is an instrumented OpenAPI Document data structure
 type Doc struct {
 	t           *openapi3.T
 	router      routers.Router
@@ -18,6 +19,7 @@ type Doc struct {
 	docPath     string
 }
 
+// NewDoc will create a new Doc based on the path provided. The path must lead to an OpenAPI spec file
 func NewDoc(docPath string) (*Doc, error) {
 	doc := Doc{docPath: docPath}
 
@@ -26,6 +28,8 @@ func NewDoc(docPath string) (*Doc, error) {
 	return &doc, err
 }
 
+// Load will load the OpenAPI specification from the file and initialize all the instrumentation.
+// This method can be called multiple times
 func (d *Doc) Load() error {
 	log.Println("loading OpenAPI File: ", d.docPath)
 	t, err := openapi3.NewLoader().LoadFromFile(d.docPath)
@@ -36,7 +40,7 @@ func (d *Doc) Load() error {
 	if err != nil {
 		return err
 	}
-	m, err := extension.NewDefaultMextFromExtensions(t.Extensions)
+	m, err := extension.NewMextFromExtensions(t.Extensions)
 	if err != nil {
 		return err
 	}
@@ -46,6 +50,7 @@ func (d *Doc) Load() error {
 	return nil
 }
 
+// FindRoute will find the route definition in the OpenAPI file, based on the request
 func (d *Doc) FindRoute(request *util.Request) (RouteDef, error) {
 	r, p, err := d.router.FindRoute(request.Request())
 	request.PathItems = p
@@ -55,6 +60,7 @@ func (d *Doc) FindRoute(request *util.Request) (RouteDef, error) {
 	return NewRouteDef(d, r, p)
 }
 
+// Servers will return the list of the servers URLs
 func (d *Doc) Servers() []string {
 	servers := make([]string, 0)
 	for _, s := range d.t.Servers {
@@ -63,6 +69,8 @@ func (d *Doc) Servers() []string {
 	return servers
 }
 
+// Watch will start the watching routine on the file described by docPath. If the file changes, then Load
+// will be invoked. If Load fails, the Doc data structure will remain unchanged but a log will be printed
 func (d *Doc) Watch() error {
 	var err error
 	d.watcher, err = fsnotify.NewWatcher()

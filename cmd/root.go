@@ -7,7 +7,10 @@ import (
 	"mockambo/server"
 )
 
+// specFilePath is the path to the specification file
 var specFilePath string
+
+// port is the port the server should run on
 var port int
 
 var RootCmd = &cobra.Command{

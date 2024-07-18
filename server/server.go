@@ -45,7 +45,7 @@ func (s Server) handler(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx.Response().Header().Set(util.HeaderContentType, res.ContentType)
+	ctx.Response().Header().Set("Content-Type", res.ContentType)
 	for k, _ := range res.Headers {
 		ctx.Response().Header().Set(k, res.Headers.Get(k))
 	}
