@@ -77,4 +77,11 @@ func TestRouteDef_RecordPlayback(t *testing.T) {
 	assert.NotNil(t, out.Payload)
 	assert.NotEmpty(t, out.Headers.Get("x-mockambo-playback"))
 
+	req, _ = http.NewRequest("GET", "http://localhost:8080/orgs/github/repos", nil)
+	req.Header.Set("x-mockambo-invalidate-recording", "true")
+	request = util.NewRequest(req)
+	out, _ = route.Process(context.Background(), request)
+	assert.NotNil(t, out.Payload)
+	assert.Empty(t, out.Headers.Get("x-mockambo-playback"))
+
 }

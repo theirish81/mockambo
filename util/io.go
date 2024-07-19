@@ -46,6 +46,11 @@ func (r Request) String() string {
 	return "[" + r.Method + "] " + r.Url
 }
 
+func (r Request) ShouldInvalidateRecording() bool {
+	h := r.Headers.Get("x-mockambo-invalidate-recording")
+	return h == "true"
+}
+
 func NewResponse() *Response {
 	return &Response{}
 }
