@@ -23,7 +23,7 @@ func NewServer(port int, doc *oapi.Doc) Server {
 	server.e.HidePort = true
 	server.e.Any("/**", server.handler)
 	server.e.HTTPErrorHandler = func(err error, c echo.Context) {
-		log.Println(fmt.Sprintf("%s -> %d", util.NewRequest(c.Request()).String(), http.StatusInternalServerError))
+		log.Println(fmt.Sprintf("%s -> %d, (%s)", util.NewRequest(c.Request()).String(), http.StatusInternalServerError, err.Error()))
 		c.Response().Header().Set("X-Mockambo", "true")
 		switch t := err.(type) {
 		case *exceptions.MockamboError:
