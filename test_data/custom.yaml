@@ -1,0 +1,20 @@
+openapi: 3.0.2
+info:
+  title: Custom
+  description: used for testing
+  version: 1.0.0
+servers:
+  - url: /api/v3
+
+paths:
+  "/additional-properties":
+    get:
+      operationId: additionalProperties
+      responses:
+        200:
+          description: testing additional properties
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: integer

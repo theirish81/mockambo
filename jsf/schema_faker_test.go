@@ -83,3 +83,16 @@ func TestGenerateInt(t *testing.T) {
 	assert.GreaterOrEqual(t, res, 1)
 	assert.LessOrEqual(t, res, 5)
 }
+
+func TestAdditionalProperties(t *testing.T) {
+	doc, _ := openapi3.NewLoader().LoadFromFile("../test_data/custom.yaml")
+	path := doc.Paths.Value("/additional-properties")
+	mext, _ := extension.NewMextFromExtensions(nil)
+	ev := evaluator.NewEvaluator()
+	out, _ := GenerateDataFromSchema(path.Get.Responses.Value("200").Value.Content.Get("application/json").Schema.Value, mext, ev)
+	assert.IsType(t, map[string]any{}, out)
+	for k, v := range out.(map[string]any) {
+		assert.IsType(t, "foo", k)
+		assert.IsType(t, 22, v)
+	}
+}

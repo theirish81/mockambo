@@ -107,6 +107,9 @@ func generateFloat(schema *openapi3.Schema, mext extension.Mext) float64 {
 // Additionally, it will determine what's the correct generation methodology using the PayloadGenerationModes
 // priority system
 func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluator.Evaluator) (any, error) {
+	if schema.Type == nil {
+		schema.Type = &openapi3.Types{openapi3.TypeObject}
+	}
 	if schema.Enum != nil {
 		return schema.Enum[rand.Intn(len(schema.Enum))], nil
 	}
@@ -169,6 +172,12 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 						if res[k], err = GenerateDataFromSchema(p.Value, mx, ev); err != nil {
 							return res, err
 						}
+					}
+				}
+				if schema.AdditionalProperties.Schema != nil {
+					var err error
+					if res[gofakeit.HipsterWord()], err = GenerateDataFromSchema(schema.AdditionalProperties.Schema.Value, mext, ev); err != nil {
+						return res, err
 					}
 				}
 				return res, nil
