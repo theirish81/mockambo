@@ -42,6 +42,10 @@ func (r Request) Request() *http.Request {
 	return r.request
 }
 
+func (r Request) String() string {
+	return "[" + r.Method + "] " + r.Url
+}
+
 func NewResponse() *Response {
 	return &Response{}
 }
