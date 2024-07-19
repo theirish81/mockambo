@@ -58,7 +58,7 @@ func (r *RouteDef) Process(ctx context.Context, req *util.Request) (*util.Respon
 	var err error
 
 	// PLAYBACK BRANCH
-	if r.mext.Playback {
+	if r.mext.Playback && !req.ShouldInvalidateRecording() {
 		key, err := r.evaluator.RunScript(r.mext.RecordingSignatureScript)
 		if err != nil {
 			return res, exceptions.Wrap("playback", err)
