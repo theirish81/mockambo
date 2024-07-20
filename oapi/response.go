@@ -46,10 +46,19 @@ func (r ResponseDef) generateResponsePayload(mext extension.Mext) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		if r.r.Content[mediaType].Schema == nil {
+		media := r.r.Content[mediaType]
+		if mext.PayloadGenerationModes[0] == extension.ModeMediaExample {
+			if mext.MediaExampleID != "" && media.Examples != nil &&
+				media.Examples[mext.MediaExampleID] != nil && media.Examples[mext.MediaExampleID].Value != nil {
+				return media.Examples[mext.MediaExampleID].Value.Value, nil
+			} else if media.Example != nil {
+				return media.Example, nil
+			}
+		}
+		if media.Schema == nil {
 			return nil, nil
 		}
-		return jsf.GenerateDataFromSchema(r.r.Content[mediaType].Schema.Value, mext, r.evaluator)
+		return jsf.GenerateDataFromSchema(media.Schema.Value, mext, r.evaluator)
 	}
 	return nil, nil
 }

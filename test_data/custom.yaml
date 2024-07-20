@@ -18,3 +18,40 @@ paths:
               schema:
                 additionalProperties:
                   type: integer
+  "/media-example1":
+    get:
+      operationId: mediaExample1
+      responses:
+        200:
+          description: media example
+          content:
+            application/json:
+              x-mockambo:
+                payloadGenerationModes:
+                  - mediaExample
+              example:
+                foo: bar
+              schema:
+                properties:
+                  foo:
+                    type: string
+  "/media-example2":
+    get:
+      operationId: mediaExample2
+      responses:
+        200:
+          description: media example
+          content:
+            application/json:
+              x-mockambo:
+                payloadGenerationModes:
+                  - mediaExample
+                mediaExampleId: default
+              examples:
+                default:
+                  value:
+                    foo: bar
+              schema:
+                properties:
+                  foo:
+                    type: string
