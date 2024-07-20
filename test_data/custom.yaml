@@ -55,3 +55,23 @@ paths:
                 properties:
                   foo:
                     type: string
+  "/all-of":
+    get:
+      operationId: allOf
+      responses:
+        200:
+          description: allof
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - required:
+                      - foo
+                    properties:
+                      foo:
+                        type: string
+                  - required:
+                      - bar
+                    properties:
+                      bar:
+                        type: string

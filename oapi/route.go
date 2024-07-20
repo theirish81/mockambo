@@ -33,7 +33,7 @@ type RouteDef struct {
 
 // NewRouteDef the RouteDef constructor. This is also where an Evaluator is initialized for the current request
 func NewRouteDef(doc *Doc, route *routers.Route, pathItems map[string]string) (RouteDef, error) {
-	mext, err := extension.MergeMextWithExtensions(doc.defaultMext, route.Operation.Extensions)
+	mext, err := extension.MergeMextWithExtensions(doc.mext, route.Operation.Extensions)
 	ev := evaluator.NewEvaluator()
 	ev.Set(evaluator.VarFake, jsf.Fake)
 	ev.Set(evaluator.VarPathItems, pathItems)

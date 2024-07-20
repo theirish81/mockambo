@@ -12,11 +12,11 @@ import (
 
 // Doc is an instrumented OpenAPI Document data structure
 type Doc struct {
-	t           *openapi3.T
-	router      routers.Router
-	defaultMext extension.Mext
-	watcher     *fsnotify.Watcher
-	docPath     string
+	t       *openapi3.T
+	router  routers.Router
+	mext    extension.Mext
+	watcher *fsnotify.Watcher
+	docPath string
 }
 
 // NewDoc will create a new Doc based on the path provided. The path must lead to an OpenAPI spec file
@@ -46,7 +46,7 @@ func (d *Doc) Load() error {
 	}
 	d.t = t
 	d.router = r
-	d.defaultMext = m
+	d.mext = m
 	return nil
 }
 

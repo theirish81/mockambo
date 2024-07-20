@@ -15,17 +15,17 @@ import (
 
 // ResponseDef is a response definition. It contains the openapi3 definition, plus its instrumentation
 type ResponseDef struct {
-	status      int
-	r           *openapi3.Response
-	err         error
-	defaultMext extension.Mext
-	evaluator   evaluator.Evaluator
+	status    int
+	r         *openapi3.Response
+	err       error
+	mext      extension.Mext
+	evaluator evaluator.Evaluator
 }
 
 func NewResponseDef(r *openapi3.Response, status int, mext extension.Mext, ev evaluator.Evaluator) (ResponseDef, error) {
-	defaultMext, err := extension.MergeMextWithExtensions(mext, r.Extensions)
+	nMext, err := extension.MergeMextWithExtensions(mext, r.Extensions)
 	ev.Set("status", status)
-	return ResponseDef{r: r, status: status, defaultMext: defaultMext, evaluator: ev}, err
+	return ResponseDef{r: r, status: status, mext: nMext, evaluator: ev}, err
 }
 
 // determineJsonMediaType looks for a media definition that contains "json" in it. As Mockambo only support JSON
