@@ -21,6 +21,7 @@ func ComputeItemsCount(schema *openapi3.Schema) int {
 	return count
 }
 
+// MergeAllOf will merge into one schemas all the sub-schemas declared in the AllOf
 func MergeAllOf(allOf openapi3.SchemaRefs, index int, schema *openapi3.Schema) {
 	extract := allOf[index].Value
 	if extract.Type.Includes(openapi3.TypeObject) {

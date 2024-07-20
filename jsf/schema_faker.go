@@ -108,6 +108,7 @@ func generateFloat(schema *openapi3.Schema, mext extension.Mext) float64 {
 // priority system
 func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluator.Evaluator) (any, error) {
 	if schema.Type == nil {
+		// rarely we can end up with a a schema == nil. We change it to TypeObject because it's the safest
 		schema.Type = &openapi3.Types{openapi3.TypeObject}
 	}
 	if schema.Enum != nil {
@@ -175,6 +176,8 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 					}
 				}
 				if schema.AdditionalProperties.Schema != nil {
+					// if AdditionalProperties has a schema, it means it wants to represent a generic map
+					// therefore we generate a key/value to make it happy
 					var err error
 					if res[gofakeit.HipsterWord()], err = GenerateDataFromSchema(schema.AdditionalProperties.Schema.Value, mext, ev); err != nil {
 						return res, err

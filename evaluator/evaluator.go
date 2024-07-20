@@ -55,6 +55,7 @@ func (e *Evaluator) RunScript(script string) (any, error) {
 		return nil, exceptions.Wrap("evaluate", err)
 	}
 	val := v.Export()
+	// if the result of the script execution is a string, we compile it as a template, thank me later
 	if val, ok := val.(string); ok {
 		t, err := e.Template(val)
 		if err != nil {
