@@ -13,11 +13,13 @@ const ModeFaker = "faker"
 const ModeDefault = "default"
 const ModeExample = "example"
 const ModeSchema = "schema"
+const ModeMediaExample = "mediaExample"
 
 // Mext is the data structure representing the x-mockambo OpenAPI extension.
 // No fields are pointers to simplify the effects of cloning
 type Mext struct {
 	PayloadGenerationModes   []string `yaml:"payloadGenerationModes"`
+	MediaExampleID           string   `yaml:"mediaExampleId"`
 	Script                   string   `yaml:"script"`
 	ValidateRequest          bool     `yaml:"validateRequest"`
 	ValidateResponse         bool     `yaml:"validateResponse"`
@@ -41,6 +43,7 @@ type Mext struct {
 func NewMextFromExtensions(extensions map[string]any) (Mext, error) {
 	mext := Mext{
 		PayloadGenerationModes:   []string{ModeScript, ModeTemplate, ModeFaker, ModeDefault, ModeExample, ModeSchema},
+		MediaExampleID:           "",
 		ValidateRequest:          true,
 		ValidateResponse:         true,
 		Display:                  false,
