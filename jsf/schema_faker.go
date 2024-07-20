@@ -14,19 +14,19 @@ import (
 const RFC3339local = "2006-01-02T15:04:05Z"
 
 // GenerateDataFromSchema recursively generates data from an OpenAPI schema
-func GenerateDataFromSchema(schema *openapi3.Schema, defaultMext extension.Mext, ev evaluator.Evaluator) (any, error) {
+func GenerateDataFromSchema(schema *openapi3.Schema, nMext extension.Mext, ev evaluator.Evaluator) (any, error) {
 	if schema == nil {
 		schema = &openapi3.Schema{}
 	}
 	var mext extension.Mext
 	if schema.Extensions != nil {
-		mx, err := extension.MergeMextWithExtensions(defaultMext, schema.Extensions)
+		mx, err := extension.MergeMextWithExtensions(nMext, schema.Extensions)
 		if err != nil {
 			return nil, err
 		}
 		mext = mx
 	} else {
-		mext = defaultMext
+		mext = nMext
 	}
 
 	return generateByPriority(schema, mext, ev)
