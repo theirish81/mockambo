@@ -1,8 +1,9 @@
 package util
 
-import "github.com/brianvoe/gofakeit"
+import (
+	"math/rand"
+)
 
 func RequiredOrRandom(required bool) bool {
-	return required || gofakeit.Bool()
-
+	return required || rand.Uint32()%2 == 0
 }

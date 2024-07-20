@@ -153,7 +153,7 @@ func generateByPriority(schema *openapi3.Schema, mext extension.Mext, ev evaluat
 				return GenerateDataFromSchema(schema.OneOf[rand.Intn(len(schema.OneOf))].Value, mext, ev)
 			}
 			if schema.AnyOf != nil {
-				return GenerateDataFromSchema(schema.OneOf[rand.Intn(len(schema.AnyOf))].Value, mext, ev)
+				return GenerateDataFromSchema(schema.AnyOf[rand.Intn(len(schema.AnyOf))].Value, mext, ev)
 			}
 			if schema.AllOf != nil {
 				sx := &openapi3.Schema{}
