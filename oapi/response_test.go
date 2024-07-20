@@ -40,4 +40,14 @@ func TestResponseDef_MediaExample(t *testing.T) {
 	assert.IsType(t, map[string]any{}, out.Payload)
 	conv = out.Payload.(map[string]any)
 	assert.Equal(t, "bar", conv["foo"])
+
+	r, _ = http.NewRequest("GET", "http://localhost/api/v3/media-example2", nil)
+	req = util.NewRequest(r)
+	route, _ = doc.FindRoute(req)
+	res, _ = route.selectResponse()
+	res.r.Content["application/json"].Extensions["x-mockambo"].(map[string]any)["mediaExampleSelectorScript"] = ""
+	out, _ = res.GenerateResponse(route.mext)
+	assert.IsType(t, map[string]any{}, out.Payload)
+	conv = out.Payload.(map[string]any)
+	assert.Equal(t, "bar", conv["foo"])
 }
