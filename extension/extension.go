@@ -18,23 +18,23 @@ const ModeMediaExample = "mediaExample"
 // Mext is the data structure representing the x-mockambo OpenAPI extension.
 // No fields are pointers to simplify the effects of cloning
 type Mext struct {
-	PayloadGenerationModes   []string `yaml:"payloadGenerationModes"`
-	MediaExampleID           string   `yaml:"mediaExampleId"`
-	Script                   string   `yaml:"script"`
-	ValidateRequest          bool     `yaml:"validateRequest"`
-	ValidateResponse         bool     `yaml:"validateResponse"`
-	Display                  bool     `yaml:"display"`
-	Proxy                    bool     `yaml:"proxy"`
-	ProxyServerIndex         int      `yaml:"proxyServerIndex"`
-	Record                   bool     `yaml:"record"`
-	Playback                 bool     `yaml:"playback"`
-	RecordingSignatureScript string   `yaml:"recordingSignatureScript"`
-	RecordingPath            string   `yaml:"recordingPath"`
-	LatencyMin               string   `yaml:"latencyMin"`
-	LatencyMax               string   `yaml:"latencyMax"`
-	ResponseSelectorScript   string   `yaml:"responseSelectorScript"`
-	Faker                    string   `yaml:"faker"`
-	Template                 string   `yaml:"template"`
+	PayloadGenerationModes     []string `yaml:"payloadGenerationModes"`
+	MediaExampleSelectorScript string   `yaml:"mediaExampleSelectorScript"`
+	Script                     string   `yaml:"script"`
+	ValidateRequest            bool     `yaml:"validateRequest"`
+	ValidateResponse           bool     `yaml:"validateResponse"`
+	Display                    bool     `yaml:"display"`
+	Proxy                      bool     `yaml:"proxy"`
+	ProxyServerIndex           int      `yaml:"proxyServerIndex"`
+	Record                     bool     `yaml:"record"`
+	Playback                   bool     `yaml:"playback"`
+	RecordingSignatureScript   string   `yaml:"recordingSignatureScript"`
+	RecordingPath              string   `yaml:"recordingPath"`
+	LatencyMin                 string   `yaml:"latencyMin"`
+	LatencyMax                 string   `yaml:"latencyMax"`
+	ResponseSelectorScript     string   `yaml:"responseSelectorScript"`
+	Faker                      string   `yaml:"faker"`
+	Template                   string   `yaml:"template"`
 }
 
 // NewMextFromExtensions will create a default mext and merge it with the root x-mockambo extension (if present).
@@ -42,19 +42,19 @@ type Mext struct {
 // within the extensions map
 func NewMextFromExtensions(extensions map[string]any) (Mext, error) {
 	mext := Mext{
-		PayloadGenerationModes:   []string{ModeScript, ModeTemplate, ModeFaker, ModeDefault, ModeExample, ModeSchema},
-		MediaExampleID:           "",
-		ValidateRequest:          true,
-		ValidateResponse:         true,
-		Display:                  false,
-		Proxy:                    false,
-		ProxyServerIndex:         0,
-		Record:                   false,
-		Playback:                 false,
-		RecordingSignatureScript: "`${method}_${url}`",
-		RecordingPath:            "recording",
-		LatencyMin:               "0s",
-		LatencyMax:               "0s",
+		PayloadGenerationModes:     []string{ModeScript, ModeTemplate, ModeFaker, ModeDefault, ModeExample, ModeSchema},
+		MediaExampleSelectorScript: "",
+		ValidateRequest:            true,
+		ValidateResponse:           true,
+		Display:                    false,
+		Proxy:                      false,
+		ProxyServerIndex:           0,
+		Record:                     false,
+		Playback:                   false,
+		RecordingSignatureScript:   "`${method}_${url}`",
+		RecordingPath:              "recording",
+		LatencyMin:                 "0s",
+		LatencyMax:                 "0s",
 	}
 	if ext, ok := extensions[MockamboExt]; ok {
 		if err := mapstructure.Decode(ext.(map[string]any), &mext); err != nil {
