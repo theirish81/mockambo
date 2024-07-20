@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func TestGenerate(t *testing.T) {
+func TestGenerateDataFromSchema(t *testing.T) {
 	doc, _ := openapi3.NewLoader().LoadFromFile("../test_data/petstore.yaml")
 	path := doc.Paths.Value("/pet/{petId}")
 	mext, _ := extension.NewMextFromExtensions(nil)
@@ -95,4 +95,85 @@ func TestAdditionalProperties(t *testing.T) {
 		assert.IsType(t, "foo", k)
 		assert.IsType(t, 22, v)
 	}
+}
+
+func TestOneOf(t *testing.T) {
+	oneOf := openapi3.SchemaRefs{
+		{
+			Value: &openapi3.Schema{
+				Type:     &openapi3.Types{openapi3.TypeObject},
+				Required: []string{"foo"},
+				Properties: openapi3.Schemas{
+					"foo": &openapi3.SchemaRef{
+						Value: &openapi3.Schema{
+							Type: &openapi3.Types{openapi3.TypeString},
+						},
+					},
+				},
+			},
+		},
+		{
+			Value: &openapi3.Schema{
+				Type:     &openapi3.Types{openapi3.TypeObject},
+				Required: []string{"bar"},
+				Properties: openapi3.Schemas{
+					"bar": &openapi3.SchemaRef{
+						Value: &openapi3.Schema{
+							Type: &openapi3.Types{openapi3.TypeString},
+						},
+					},
+				},
+			},
+		},
+	}
+	mext, _ := extension.NewMextFromExtensions(nil)
+	s, err := GenerateDataFromSchema(&openapi3.Schema{
+		OneOf: oneOf,
+	}, mext, evaluator.NewEvaluator())
+	assert.Nil(t, err)
+	assert.IsType(t, map[string]any{}, s)
+	_, ok1 := s.(map[string]any)["foo"]
+	_, ok2 := s.(map[string]any)["bar"]
+	assert.True(t, ok1 || ok2)
+	assert.False(t, ok1 && ok2)
+}
+
+func TestAllOf(t *testing.T) {
+	allOf := openapi3.SchemaRefs{
+		{
+			Value: &openapi3.Schema{
+				Type:     &openapi3.Types{openapi3.TypeObject},
+				Required: []string{"foo"},
+				Properties: openapi3.Schemas{
+					"foo": &openapi3.SchemaRef{
+						Value: &openapi3.Schema{
+							Type: &openapi3.Types{openapi3.TypeString},
+						},
+					},
+				},
+			},
+		},
+		{
+			Value: &openapi3.Schema{
+				Type:     &openapi3.Types{openapi3.TypeObject},
+				Required: []string{"bar"},
+				Properties: openapi3.Schemas{
+					"bar": &openapi3.SchemaRef{
+						Value: &openapi3.Schema{
+							Type: &openapi3.Types{openapi3.TypeString},
+						},
+					},
+				},
+			},
+		},
+	}
+	mext, _ := extension.NewMextFromExtensions(nil)
+	s, err := GenerateDataFromSchema(&openapi3.Schema{
+		AllOf: allOf,
+	}, mext, evaluator.NewEvaluator())
+	assert.Nil(t, err)
+	assert.IsType(t, map[string]any{}, s)
+	_, ok1 := s.(map[string]any)["foo"]
+	_, ok2 := s.(map[string]any)["bar"]
+	assert.True(t, ok1 && ok2)
 }
