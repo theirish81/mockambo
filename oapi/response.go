@@ -1,9 +1,11 @@
 package oapi
 
 import (
+	"errors"
 	"fmt"
 	"github.com/getkin/kin-openapi/openapi3"
 	"mockambo/evaluator"
+	"mockambo/exceptions"
 	"mockambo/extension"
 	"mockambo/jsf"
 	"mockambo/util"
@@ -47,12 +49,17 @@ func (r ResponseDef) generateResponsePayload(mext extension.Mext) (any, error) {
 			return nil, err
 		}
 		media := r.r.Content[mediaType]
+		// if mediaExample is the highest priority
 		if mext.PayloadGenerationModes[0] == extension.ModeMediaExample {
-			if mext.MediaExampleID != "" && media.Examples != nil &&
-				media.Examples[mext.MediaExampleID] != nil && media.Examples[mext.MediaExampleID].Value != nil {
-				return media.Examples[mext.MediaExampleID].Value.Value, nil
-			} else if media.Example != nil {
-				return media.Example, nil
+			// if there's a selector script, it means the user wants to decide which, across multiple examples,
+			// should be served
+			if mext.MediaExampleSelectorScript != "" {
+				return r.runMediaTypeExampleScript(media, mext.MediaExampleSelectorScript)
+			} else {
+				// otherwise we pick the default example, or any example if the default is missing
+				if res := r.runDefaultMediaTypeExample(media); res != nil {
+					return res, nil
+				}
 			}
 		}
 		if media.Schema == nil {
@@ -93,4 +100,36 @@ func (r ResponseDef) GenerateResponse(mext extension.Mext) (*util.Response, erro
 		return res, err
 	}
 	return res, nil
+}
+
+// runMediaTypeExampleScript executes the media-type example selector script, and retrieves the selected example
+func (r ResponseDef) runMediaTypeExampleScript(media *openapi3.MediaType, script string) (any, error) {
+	sel, err := r.evaluator.RunScript(script)
+	if err != nil {
+		return nil, err
+	}
+	switch t := sel.(type) {
+	case string:
+		ex := media.Examples[t]
+		if ex != nil && ex.Value != nil {
+			return ex.Value.Value, nil
+		} else {
+			return nil, exceptions.Wrap("media_example", errors.New("example "+sel.(string)+" not found"))
+		}
+	default:
+		return nil, exceptions.Wrap("media_example", errors.New("type conversion error"))
+	}
+}
+
+// runDefaultMediaTypeExample retrieves any media-type example and returns it
+func (r ResponseDef) runDefaultMediaTypeExample(media *openapi3.MediaType) any {
+	if media.Example != nil {
+		return media.Example
+	}
+	if media.Examples != nil {
+		for _, v := range media.Examples {
+			return v.Value.Value
+		}
+	}
+	return nil
 }

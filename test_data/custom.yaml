@@ -46,7 +46,7 @@ paths:
               x-mockambo:
                 payloadGenerationModes:
                   - mediaExample
-                mediaExampleId: default
+                mediaExampleSelectorScript: "'default'"
               examples:
                 default:
                   value:
