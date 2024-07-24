@@ -29,7 +29,7 @@ var RunCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		doc, err := oapi.NewDoc(specFilePath, mergerFilePath)
 		if err != nil {
-			log.Fatalln("The specified file `", specFilePath, "` is not a valid OpenAPI 3 specification")
+			log.Fatalln("Error while parsing files: ", err)
 		}
 		if err := doc.Watch(); err != nil {
 			log.Fatalln(err)

@@ -7,6 +7,7 @@ import (
 	"github.com/getkin/kin-openapi/routers/gorillamux"
 	"gopkg.in/yaml.v2"
 	"log"
+	"mockambo/exceptions"
 	"mockambo/extension"
 	"mockambo/util"
 	"net/url"
@@ -45,19 +46,19 @@ func (d *Doc) Load() error {
 	if d.mergerPath != "" {
 		mergerData, err := os.ReadFile(d.mergerPath)
 		if err != nil {
-			return err
+			return exceptions.Wrap("merge_file", err)
 		}
 		m1 := make(map[any]any)
 		m2 := make(map[any]any)
 		if err := yaml.Unmarshal(data, &m1); err != nil {
-			return err
+			return exceptions.Wrap("spec", err)
 		}
 		if err := yaml.Unmarshal(mergerData, &m2); err != nil {
-			return err
+			return exceptions.Wrap("merge_file", err)
 		}
 		out := DeepMerge(m1, m2)
 		if data, err = yaml.Marshal(out); err != nil {
-			return err
+			return exceptions.Wrap("merger", err)
 		}
 	}
 	loader := openapi3.NewLoader()
@@ -73,22 +74,22 @@ func (d *Doc) Load() error {
 		}
 		fullPath, err := filepath.Abs(d.docPath)
 		if err != nil {
-			return nil, err
+			return nil, exceptions.Wrap("load_resource", err)
 		}
 		px = filepath.Join(filepath.Dir(fullPath), px)
 		return os.ReadFile(px)
 	}
 	t, err := loader.LoadFromData(data)
 	if err != nil {
-		return err
+		return exceptions.Wrap("parser", err)
 	}
 	r, err := gorillamux.NewRouter(t)
 	if err != nil {
-		return err
+		return exceptions.Wrap("router", err)
 	}
 	m, err := extension.NewMextFromExtensions(t.Extensions)
 	if err != nil {
-		return err
+		return exceptions.Wrap("default_extension", err)
 	}
 	d.t = t
 	d.router = r
