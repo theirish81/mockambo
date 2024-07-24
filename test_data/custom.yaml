@@ -75,3 +75,13 @@ paths:
                     properties:
                       bar:
                         type: string
+  "/loader":
+    get:
+      operationId: loader
+      responses:
+        200:
+          description: loader
+          content:
+              application/json:
+                schema:
+                  $ref: "loader.yaml#/components/schemas/loader"

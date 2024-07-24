@@ -10,6 +10,8 @@ import (
 // specFilePath is the path to the specification file
 var specFilePath string
 
+var mergerFilePath string
+
 // port is the port the server should run on
 var port int
 
@@ -25,7 +27,7 @@ var RunCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Runs the Mockambo server",
 	Run: func(cmd *cobra.Command, args []string) {
-		doc, err := oapi.NewDoc(specFilePath)
+		doc, err := oapi.NewDoc(specFilePath, mergerFilePath)
 		if err != nil {
 			log.Fatalln("The specified file `", specFilePath, "` is not a valid OpenAPI 3 specification")
 		}
@@ -44,4 +46,5 @@ func init() {
 	RunCmd.PersistentFlags().StringVarP(&specFilePath, "spec", "s", "", "path to an OpenAPI 3 specification file")
 	_ = RunCmd.MarkPersistentFlagRequired("spec")
 	RunCmd.PersistentFlags().IntVarP(&port, "port", "p", 8080, "the port the mocking server should use")
+	RunCmd.PersistentFlags().StringVarP(&mergerFilePath, "merger", "m", "", "path to a YAML file to be merged to the original OpenAPI file")
 }

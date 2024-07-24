@@ -1,6 +1,7 @@
 package jsf
 
 import (
+	"fmt"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/stretchr/testify/assert"
 	"mockambo/evaluator"
@@ -85,7 +86,10 @@ func TestGenerateInt(t *testing.T) {
 }
 
 func TestAdditionalProperties(t *testing.T) {
-	doc, _ := openapi3.NewLoader().LoadFromFile("../test_data/custom.yaml")
+	l := openapi3.NewLoader()
+	l.IsExternalRefsAllowed = true
+	doc, err := l.LoadFromFile("../test_data/custom.yaml")
+	fmt.Println(err)
 	path := doc.Paths.Value("/additional-properties")
 	mext, _ := extension.NewMextFromExtensions(nil)
 	ev := evaluator.NewEvaluator()

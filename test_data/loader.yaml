@@ -1,0 +1,8 @@
+components:
+  schemas:
+    loader:
+      required:
+        - test123
+      properties:
+        test123:
+          type: integer

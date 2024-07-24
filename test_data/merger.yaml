@@ -1,0 +1,19 @@
+paths:
+  "/merger":
+    get:
+      operationId: merger
+      responses:
+        200:
+          description: successful merger
+          content:
+            application/json:
+              schema:
+                required:
+                  - foo
+                  - test
+                properties:
+                  foo:
+                    type: string
+                    example: bar
+                  test:
+                    type: integer
