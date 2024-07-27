@@ -5,23 +5,30 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/routers"
 	"github.com/getkin/kin-openapi/routers/gorillamux"
+	"gopkg.in/yaml.v2"
 	"log"
+	"mockambo/exceptions"
 	"mockambo/extension"
 	"mockambo/util"
+	"net/url"
+	"os"
+	"path"
+	"path/filepath"
 )
 
 // Doc is an instrumented OpenAPI Document data structure
 type Doc struct {
-	t       *openapi3.T
-	router  routers.Router
-	mext    extension.Mext
-	watcher *fsnotify.Watcher
-	docPath string
+	t          *openapi3.T
+	router     routers.Router
+	mext       extension.Mext
+	watcher    *fsnotify.Watcher
+	docPath    string
+	mergerPath string
 }
 
 // NewDoc will create a new Doc based on the path provided. The path must lead to an OpenAPI spec file
-func NewDoc(docPath string) (*Doc, error) {
-	doc := Doc{docPath: docPath}
+func NewDoc(docPath string, mergerPath string) (*Doc, error) {
+	doc := Doc{docPath: docPath, mergerPath: mergerPath}
 
 	err := doc.Load()
 
@@ -32,17 +39,57 @@ func NewDoc(docPath string) (*Doc, error) {
 // This method can be called multiple times
 func (d *Doc) Load() error {
 	log.Println("loading OpenAPI File: ", d.docPath)
-	t, err := openapi3.NewLoader().LoadFromFile(d.docPath)
+	data, err := os.ReadFile(d.docPath)
 	if err != nil {
 		return err
+	}
+	if d.mergerPath != "" {
+		mergerData, err := os.ReadFile(d.mergerPath)
+		if err != nil {
+			return exceptions.Wrap("merge_file", err)
+		}
+		m1 := make(map[any]any)
+		m2 := make(map[any]any)
+		if err := yaml.Unmarshal(data, &m1); err != nil {
+			return exceptions.Wrap("spec", err)
+		}
+		if err := yaml.Unmarshal(mergerData, &m2); err != nil {
+			return exceptions.Wrap("merge_file", err)
+		}
+		out := DeepMerge(m1, m2)
+		if data, err = yaml.Marshal(out); err != nil {
+			return exceptions.Wrap("merger", err)
+		}
+	}
+	loader := openapi3.NewLoader()
+	loader.IsExternalRefsAllowed = true
+	superFunc := loader.ReadFromURIFunc
+	loader.ReadFromURIFunc = func(loader *openapi3.Loader, url *url.URL) ([]byte, error) {
+		if url.Scheme != "" {
+			return superFunc(loader, url)
+		}
+		px := url.Path
+		if path.IsAbs(px) {
+			return os.ReadFile(px)
+		}
+		fullPath, err := filepath.Abs(d.docPath)
+		if err != nil {
+			return nil, exceptions.Wrap("load_resource", err)
+		}
+		px = filepath.Join(filepath.Dir(fullPath), px)
+		return os.ReadFile(px)
+	}
+	t, err := loader.LoadFromData(data)
+	if err != nil {
+		return exceptions.Wrap("parser", err)
 	}
 	r, err := gorillamux.NewRouter(t)
 	if err != nil {
-		return err
+		return exceptions.Wrap("router", err)
 	}
 	m, err := extension.NewMextFromExtensions(t.Extensions)
 	if err != nil {
-		return err
+		return exceptions.Wrap("default_extension", err)
 	}
 	d.t = t
 	d.router = r
@@ -97,5 +144,11 @@ func (d *Doc) Watch() error {
 			}
 		}
 	}()
-	return d.watcher.Add(d.docPath)
+	if err := d.watcher.Add(d.docPath); err != nil {
+		return err
+	}
+	if err := d.watcher.Add(d.mergerPath); err != nil {
+		return err
+	}
+	return nil
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func TestRouteDef_SelectResponse(t *testing.T) {
-	doc, _ := NewDoc("../test_data/petstore.yaml")
+	doc, _ := NewDoc("../test_data/petstore.yaml", "")
 	req, _ := http.NewRequest("GET", "http://example.com/api/v3/pet/123", nil)
 	request := util.NewRequest(req)
 	route, _ := doc.FindRoute(request)
@@ -52,7 +52,7 @@ func TestRouteDef_SelectResponse(t *testing.T) {
 }
 
 func TestRouteDef_Process(t *testing.T) {
-	doc, _ := NewDoc("../test_data/petstore.yaml")
+	doc, _ := NewDoc("../test_data/petstore.yaml", "")
 	req, _ := http.NewRequest("GET", "http://example.com/api/v3/pet/123", nil)
 	request := util.NewRequest(req)
 	route, _ := doc.FindRoute(request)
@@ -61,7 +61,7 @@ func TestRouteDef_Process(t *testing.T) {
 }
 
 func TestRouteDef_RecordPlayback(t *testing.T) {
-	doc, _ := NewDoc("../test_data/github.yaml")
+	doc, _ := NewDoc("../test_data/github.yaml", "")
 	doc.mext.RecordingPath = path.Join(os.TempDir(), "mockambo_"+gofakeit.UUID())
 	req, _ := http.NewRequest("GET", "http://localhost:8080/orgs/github/repos", nil)
 	request := util.NewRequest(req)

@@ -29,5 +29,5 @@ func Wrap(eType string, origin error) error {
 }
 
 func (e MockamboError) Error() string {
-	return e.Message
+	return "(" + e.EType + ") " + e.Message
 }

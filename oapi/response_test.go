@@ -9,7 +9,7 @@ import (
 )
 
 func TestResponseDef_GenerateResponseBundle(t *testing.T) {
-	doc, _ := NewDoc("../test_data/petstore.yaml")
+	doc, _ := NewDoc("../test_data/petstore.yaml", "")
 	r, _ := http.NewRequest("GET", "http://example.com/api/v3/pet/123", nil)
 	req := util.NewRequest(r)
 	route, _ := doc.FindRoute(req)
@@ -22,7 +22,7 @@ func TestResponseDef_GenerateResponseBundle(t *testing.T) {
 }
 
 func TestResponseDef_MediaExample(t *testing.T) {
-	doc, _ := NewDoc("../test_data/custom.yaml")
+	doc, _ := NewDoc("../test_data/custom.yaml", "")
 	r, _ := http.NewRequest("GET", "http://localhost/api/v3/media-example1", nil)
 	req := util.NewRequest(r)
 	route, _ := doc.FindRoute(req)
