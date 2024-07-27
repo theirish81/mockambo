@@ -1,4 +1,15 @@
 paths:
+  "/additional-properties":
+    get:
+      responses:
+        200:
+          content:
+            application/json:
+              x-mockambo:
+                payloadGenerationModes:
+                  - mediaExample
+              example:
+                foo: 22
   "/merger":
     get:
       operationId: merger

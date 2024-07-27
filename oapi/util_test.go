@@ -35,5 +35,14 @@ func TestDeepMerge(t *testing.T) {
 	assert.Equal(t, 2, out["arr"].([]any)[1])
 	assert.Equal(t, 3, out["arr"].([]any)[2])
 	assert.Equal(t, 4, out["arr"].([]any)[3])
+}
 
+func TestMerger(t *testing.T) {
+	merger, _ := NewDoc("../test_data/custom.yaml", "../test_data/merger.yaml")
+	_ = merger.Load()
+	media := merger.t.Paths.Value("/additional-properties").Get.Responses.Value("200").Value.
+		Content.Get("application/json")
+	_, ok := media.Extensions["x-mockambo"]
+	assert.True(t, ok)
+	assert.NotNil(t, media.Example)
 }
