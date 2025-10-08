@@ -1,4 +1,4 @@
-FROM golang:1.22.5-bullseye AS builder
+FROM golang:1.24.8-bookworm AS builder
 
 RUN mkdir /usr/local/mockambo
 WORKDIR /usr/local/mockambo
@@ -8,7 +8,7 @@ COPY . .
 RUN go get
 RUN go build -o mockambo *.go
 
-FROM debian:bullseye
+FROM debian:bookworm
 RUN mkdir /usr/local/mockambo
 WORKDIR /usr/local/mockambo
 COPY --from=builder /usr/local/mockambo/mockambo .
